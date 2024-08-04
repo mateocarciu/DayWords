@@ -1,5 +1,5 @@
 # Installer Expo CLI globalement
-npm install -g expo-cli
+yarn install -g expo-cli
 
 # Installer les packages nécessaires
 yarn install
