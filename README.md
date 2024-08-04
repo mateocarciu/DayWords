@@ -5,4 +5,4 @@ yarn install -g expo-cli
 yarn install
 
 # Lancer le projet
-npm expo start or npm start
+yarn expo start or yarn start
