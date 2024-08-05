@@ -1,14 +1,19 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, FlatList, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { useUser } from '../hooks/UserContext';
 
 const DetailScreen = ({ route }) => {
   const { entry } = route.params;
+  const { user, setUser } = useUser();
+  const [commentText, setCommentText] = useState('');
 
-  const comments = [
-    { id: 1, username: 'Friend1', text: 'Great post!', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', time: new Date(Date.now() - 30000) },
-    { id: 2, username: 'Friend2', text: 'Interesting...', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', time: new Date(Date.now() - 61000) },
-  ];
+  // Simulated comments (you can replace this with actual data from your backend)
+  const [comments] = useState([
+    { id: 1, username: 'Friend1', text: 'Great post!', profileImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg', time: new Date(Date.now() - 30000) },
+    { id: 2, username: 'Friend2', text: 'Interesting...', profileImageUrl: 'https://randomuser.me/api/portraits/women/1.jpg', time: new Date(Date.now() - 61000) },
+  ]);
 
+  // Function to get elapsed time
   const getTimeAgo = (date) => {
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
@@ -27,10 +32,10 @@ const DetailScreen = ({ route }) => {
     <View style={styles.container}>
       <Text style={styles.title}>{entry.username}'s Words</Text>
       <View style={styles.entry}>
-        <Image source={{ uri: entry.avatar }} style={styles.userAvatar} />
+        <Image source={{ uri: entry.profileImageUrl }} style={styles.userAvatar} />
         <View style={styles.entryContent}>
           <Text style={styles.entryText}>{entry.text}</Text>
-          <Text style={styles.entryMeta}>{entry.time} - {entry.location}</Text>
+          <Text style={styles.entryMeta}>{getTimeAgo(new Date(entry.time))} - {entry.location}</Text>
         </View>
       </View>
       <Text style={styles.commentsTitle}>Comments</Text>
@@ -39,7 +44,7 @@ const DetailScreen = ({ route }) => {
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.comment}>
-            <Image source={{ uri: item.avatar }} style={styles.commentAvatar} />
+            <Image source={{ uri: item.profileImageUrl }} style={styles.commentAvatar} />
             <View style={styles.commentTextContainer}>
               <Text style={styles.commentUsername}>{item.username}</Text>
               <Text style={styles.commentTime}>{getTimeAgo(new Date(item.time))}</Text>
@@ -49,6 +54,21 @@ const DetailScreen = ({ route }) => {
         )}
         style={styles.commentList}
       />
+      <View style={styles.addCommentContainer}>
+        <TextInput
+          placeholder="Add a comment..."
+          placeholderTextColor="#aaa"
+          value={commentText}
+          onChangeText={setCommentText}
+          style={styles.commentInput}
+        />
+        <TouchableOpacity
+          style={styles.addCommentButton}
+
+        >
+          <Text style={styles.addCommentButtonText}>Post</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -56,26 +76,8 @@ const DetailScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f7',
     padding: 20,
     position: 'relative',
-  },
-  profileButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    overflow: 'hidden',
-    backgroundColor: '#6200ee',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
   },
   title: {
     fontSize: 28,
@@ -155,6 +157,30 @@ const styles = StyleSheet.create({
   },
   commentList: {
     marginTop: 10,
+  },
+  addCommentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  commentInput: {
+    flex: 1,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: '#fff',
+    marginRight: 10,
+  },
+  addCommentButton: {
+    backgroundColor: '#6200ee',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  addCommentButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

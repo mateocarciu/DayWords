@@ -11,24 +11,27 @@ import HistoryScreen from './screens/HistoryScreen';
 import FriendsScreen from './screens/FriendsScreen';
 import AddFriendScreen from './screens/AddFriendScreen';
 import DetailScreen from './screens/DetailScreen';
+import { UserProvider } from './hooks/UserContext'; // Importez le UserProvider
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="History" component={HistoryScreen} />
-        <Stack.Screen name="Friends" component={FriendsScreen} />
-        <Stack.Screen name="AddFriend" component={AddFriendScreen} />
-        <Stack.Screen name="Detail" component={DetailScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="History" component={HistoryScreen} />
+          <Stack.Screen name="Friends" component={FriendsScreen} />
+          <Stack.Screen name="AddFriend" component={AddFriendScreen} />
+          <Stack.Screen name="Detail" component={DetailScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserProvider>
   );
 };
 

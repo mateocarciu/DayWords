@@ -1,25 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useUser } from '../hooks/UserContext'; // Importez le hook useUser
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { user, setUser } = useUser(); // Utilisez le hook useUser pour obtenir user et setUser
 
   const handleLogin = () => {
-    try {
-      // Ici tu pourrais ajouter la logique réelle pour se connecter, par exemple :
-      // const response = await loginUser(email, password);
-      // if (response.success) {
-      //   navigation.navigate('Home');
-      // } else {
-      //   throw new Error('Login failed');
-      // }
-
-      // Pour l'instant, simplement naviguer vers Home
-      navigation.navigate('Home');
-    } catch (error) {
-      console.error('Login failed:', error);
-      Alert.alert('Login Error', 'An error occurred while trying to log in. Please try again.');
+    if (email === user.email && password === user.password) {
+      setUser(user);
+      navigation.navigate('Home'); // Redirigez vers la page d'accueil après une connexion réussie
+    } else {
+      Alert.alert('Login Error', 'Invalid credentials. Please try again.');
     }
   };
 
@@ -28,7 +21,7 @@ const LoginScreen = ({ navigation }) => {
       <Text style={styles.title}>Welcome to DayWords</Text>
       <Text style={styles.title}>Login</Text>
       <TextInput
-        placeholder="Email or Username"
+        placeholder="Email"
         placeholderTextColor="#aaa"
         value={email}
         onChangeText={setEmail}
@@ -60,7 +53,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f4f7',
     padding: 20,
   },
   title: {

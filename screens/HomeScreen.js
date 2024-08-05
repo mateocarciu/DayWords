@@ -1,32 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { useUser } from '../hooks/UserContext';
 
 const HomeScreen = ({ navigation }) => {
+  const { user, setUser } = useUser();
   const [text, setText] = useState('');
-  const [entry, setEntry] = useState(null);
+  const [todayEntry, setTodayEntry] = useState(null);
 
-  const friendsEntries = [
-    { id: 1, username: 'JohnDoe', text: 'Had a great day thank you varikars, yes yes shkipdopdop ppap pa pap pap appa ppa !', time: '14:30', avatar: 'https://randomuser.me/api/portraits/men/1.jpg', location: 'New York, USA' },
-    { id: 2, username: 'JaneSmith', text: 'Visited a beautiful park.', time: '15:45', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', location: 'London, UK' },
-    { id: 3, username: 'kar', text: 'Visited a beautiful park.', time: '15:45', avatar: 'https://randomuser.me/api/portraits/men/2.jpg', location: 'London, UK' },
-    { id: 4, username: 'smith', text: 'Visited johhny sins yesterday, it was awesome :)).', time: '15:00', avatar: 'https://randomuser.me/api/portraits/women/7.jpg', location: 'LA, USA' },
-    { id: 5, username: 'smith', text: 'Visited a beautiful park.', time: '15:45', avatar: 'https://randomuser.me/api/portraits/women/2.jpg', location: 'London, UK' },
-  ];
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const entry = user.entries.find(e => e.date === today);
+    setTodayEntry(entry || null);
+  }, [user.entries]);
 
   const handleSave = () => {
-    try {
-      if (text.trim() === '') {
-        Alert.alert('Error', 'Please write something about your day before sending.');
-        return;
-      }
-      const newEntry = { id: 1, username: "Morue69", text, time: new Date().toLocaleTimeString(), location: 'Paris, France', avatar:'https://randomuser.me/api/portraits/men/3.jpg' };
-      setEntry(newEntry);
-      setText('');
-    } catch (error) {
-      console.error('Failed to save entry:', error);
-      Alert.alert('Error', 'An unexpected error occurred while saving your entry.');
+    if (text.trim() === '') {
+      Alert.alert('Error', 'Please write something about your day before sending.');
+      return;
     }
+
+    const newEntry = {
+      id: user.entries.length + 1,
+      username: user.username,
+      text,
+      time: new Date().toLocaleTimeString(),
+      date: new Date().toISOString().split('T')[0],
+      location: user.location,
+      profileImageUrl: user.profileImageUrl,
+      emotion: null,
+      mediaUrl: '',
+      isPublic: true,
+      comments: []
+    };
+
+    setUser({ ...user, entries: [...user.entries, newEntry] });
+    setText('');
   };
 
   return (
@@ -37,7 +46,7 @@ const HomeScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('Profile')}
         >
           <Image
-            source={{ uri: 'https://randomuser.me/api/portraits/men/3.jpg' }} // Utiliser une vraie photo de profil
+            source={{ uri: user.profileImageUrl }}
             style={styles.profileImage}
           />
         </TouchableOpacity>
@@ -47,54 +56,52 @@ const HomeScreen = ({ navigation }) => {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false} // Masquer la barre de défilement
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.yourWordsContainer}>
           <Text style={styles.yourWordsTitle}>Your Words</Text>
-          {!entry ? (
-            <>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholder="Write something about your day..."
-                  placeholderTextColor="#aaa"
-                  value={text}
-                  onChangeText={setText}
-                  style={styles.textArea}
-                  multiline={true}
-                  numberOfLines={4}
-                />
-                <TouchableOpacity 
-                  style={[styles.button, text.trim() === '' && styles.buttonDisabled]} 
-                  onPress={handleSave}
-                  disabled={text.trim() === ''}
-                >
-                  <MaterialIcons name="send" size={24} color="#fff" />
-                </TouchableOpacity>
-              </View>
-            </>
-          ) : (
+          {todayEntry ? (
             <TouchableOpacity
               style={styles.entry}
-              onPress={() => navigation.navigate('Detail', { entry })}
+              onPress={() => navigation.navigate('Detail', { entry: todayEntry })}
             >
-              <Text style={styles.entryText}>{entry.text}</Text>
+              <Text style={styles.entryText}>{todayEntry.text}</Text>
               <FontAwesome name="arrow-right" size={20} color="#6200ee" style={styles.entryIcon} />
             </TouchableOpacity>
+          ) : (
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Write something about your day..."
+                placeholderTextColor="#aaa"
+                value={text}
+                onChangeText={setText}
+                style={styles.textArea}
+                multiline={true}
+                numberOfLines={4}
+              />
+              <TouchableOpacity 
+                style={[styles.button, text.trim() === '' && styles.buttonDisabled]} 
+                onPress={handleSave}
+                disabled={text.trim() === ''}
+              >
+                <MaterialIcons name="send" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
           )}
         </View>
 
         <Text style={styles.friendsTitle}>Friends Words</Text>
-        {friendsEntries.map(item => (
+        {user.friends.map(item => (
           <TouchableOpacity
             key={item.id}
             style={styles.friendEntry}
             onPress={() => navigation.navigate('Detail', { entry: item })}
           >
-            <Image source={{ uri: item.avatar }} style={styles.friendAvatar} />
+            <Image source={{ uri: item.profileImageUrl }} style={styles.friendAvatar} />
             <View style={styles.friendTextContainer}>
-              <Text style={styles.friendUsername}>{item.username}</Text>
-              <Text style={styles.friendTime}>{item.time} - {item.location}</Text>
-              <Text style={styles.friendText}>{item.text}</Text>
+              <Text style={styles.friendName}>{item.username}</Text>
+              <Text style={styles.friendText}>{item.text || 'No entry today'}</Text>
+              <Text style={styles.friendTime}>{item.time || ''} - {item.location}</Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -115,7 +122,7 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 10,
     alignItems: 'center',
-    zIndex: 1, // Pour s'assurer que le header est au-dessus du contenu
+    zIndex: 1,
   },
   profileButton: {
     position: 'absolute',
@@ -143,10 +150,10 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    marginTop: 1, // Décalage pour éviter que le contenu ne passe sous le header fixe
+    marginTop: 1,
   },
   scrollContent: {
-    paddingTop: 70, // Assurez-vous que le contenu commence après le header fixe
+    paddingTop: 70,
   },
   yourWordsContainer: {
     marginBottom: 25,
@@ -229,7 +236,7 @@ const styles = StyleSheet.create({
   friendTextContainer: {
     flex: 1,
   },
-  friendUsername: {
+  friendName: {
     fontSize: 16,
     fontWeight: 'bold',
   },

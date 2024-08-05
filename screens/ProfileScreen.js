@@ -1,13 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons'; // Utilisation de MaterialIcons
+import { MaterialIcons } from '@expo/vector-icons';
+import { useUser } from '../hooks/UserContext'; // Importez le hook useUser
 
 const ProfileScreen = ({ navigation }) => {
-  const user = {
-    username: "Morue69",
-    avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
-    location: 'Paris, France',
-  };
+  const { user } = useUser(); // Utilisez le hook useUser pour accéder aux données utilisateur
 
   return (
     <View style={styles.container}>
@@ -18,9 +15,10 @@ const ProfileScreen = ({ navigation }) => {
         <MaterialIcons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
       <View style={styles.profileContainer}>
-        <Image source={{ uri: user.avatar }} style={styles.profileImage} />
+        <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
         <Text style={styles.username}>{user.username}</Text>
         <Text style={styles.location}>{user.location}</Text>
+        <Text style={styles.bio}>{user.bio}</Text>
       </View>
     </View>
   );
@@ -32,7 +30,6 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
   },
   backButton: {
     position: 'absolute',
@@ -61,6 +58,12 @@ const styles = StyleSheet.create({
   location: {
     fontSize: 16,
     color: '#888',
+  },
+  bio: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 
