@@ -16,7 +16,7 @@ const HomeScreen = ({ navigation }) => {
 
   const handleSave = (parentEntryId = null) => {
     if (text.trim() === '') {
-      Alert.alert('Erreur', 'Veuillez écrire quelque chose sur votre journée avant d\'envoyer.');
+      Alert.alert('Erreur', 'Please type something before saving.');
       return;
     }
 
@@ -80,7 +80,7 @@ const HomeScreen = ({ navigation }) => {
               ))}
               <View style={styles.inputContainer}>
                 <TextInput
-                  placeholder="Ajoutez à votre thread..."
+                  placeholder="Start a thread..."
                   placeholderTextColor="#aaa"
                   value={text}
                   onChangeText={setText}
@@ -100,7 +100,7 @@ const HomeScreen = ({ navigation }) => {
           ) : (
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Écrivez quelque chose sur votre journée..."
+                placeholder="Type something about your day..."
                 placeholderTextColor="#aaa"
                 value={text}
                 onChangeText={setText}
@@ -129,7 +129,7 @@ const HomeScreen = ({ navigation }) => {
             <Image source={{ uri: item.profileImageUrl }} style={styles.friendAvatar} />
             <View style={styles.friendTextContainer}>
               <Text style={styles.friendName}>{item.username}</Text>
-              <Text style={styles.friendText}>{item.text || 'Pas d\'entrée aujourd\'hui'}</Text>
+              <Text style={styles.friendText}>{item.text || 'No entry today'}</Text>
               <Text style={styles.friendTime}>{item.time || ''} - {item.location}</Text>
             </View>
           </TouchableOpacity>
