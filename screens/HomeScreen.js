@@ -6,17 +6,17 @@ import { useUser } from '../hooks/UserContext';
 const HomeScreen = ({ navigation }) => {
   const { user, setUser } = useUser();
   const [text, setText] = useState('');
-  const [todayEntry, setTodayEntry] = useState(null);
+  const [threadEntries, setThreadEntries] = useState([]);
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
-    const entry = user.entries.find(e => e.date === today);
-    setTodayEntry(entry || null);
+    const entry = user.entries.find(e => e.date === today && e.parentEntry === null);
+    setThreadEntries(entry ? [entry, ...user.entries.filter(e => e.parentEntry === entry.id)] : []);
   }, [user.entries]);
 
-  const handleSave = () => {
+  const handleSave = (parentEntryId = null) => {
     if (text.trim() === '') {
-      Alert.alert('Error', 'Please write something about your day before sending.');
+      Alert.alert('Erreur', 'Veuillez écrire quelque chose sur votre journée avant d\'envoyer.');
       return;
     }
 
@@ -31,11 +31,17 @@ const HomeScreen = ({ navigation }) => {
       emotion: null,
       mediaUrl: '',
       isPublic: true,
+      parentEntry: parentEntryId,
       comments: []
     };
 
     setUser({ ...user, entries: [...user.entries, newEntry] });
     setText('');
+  };
+
+  const addThreadEntry = () => {
+    const parentEntryId = threadEntries[0]?.id;
+    handleSave(parentEntryId);
   };
 
   return (
@@ -59,19 +65,42 @@ const HomeScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.yourWordsContainer}>
-          <Text style={styles.yourWordsTitle}>Your Words</Text>
-          {todayEntry ? (
-            <TouchableOpacity
-              style={styles.entry}
-              onPress={() => navigation.navigate('Detail', { entry: todayEntry })}
-            >
-              <Text style={styles.entryText}>{todayEntry.text}</Text>
-              <FontAwesome name="arrow-right" size={20} color="#6200ee" style={styles.entryIcon} />
-            </TouchableOpacity>
+          <Text style={styles.yourWordsTitle}>Vos mots</Text>
+          {threadEntries.length > 0 ? (
+            <View>
+              {threadEntries.slice(0, 1).map((entry, index) => (
+                <TouchableOpacity
+                  key={entry.id}
+                  style={styles.entry}
+                  onPress={() => navigation.navigate('Detail', { entry })}
+                >
+                  <Text style={styles.entryText}>{entry.text}</Text>
+                  <FontAwesome name="arrow-right" size={20} color="#6200ee" style={styles.entryIcon} />
+                </TouchableOpacity>
+              ))}
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholder="Ajoutez à votre thread..."
+                  placeholderTextColor="#aaa"
+                  value={text}
+                  onChangeText={setText}
+                  style={styles.textArea}
+                  multiline={true}
+                  numberOfLines={4}
+                />
+                <TouchableOpacity 
+                  style={[styles.button, text.trim() === '' && styles.buttonDisabled]} 
+                  onPress={addThreadEntry}
+                  disabled={text.trim() === ''}
+                >
+                  <MaterialIcons name="send" size={24} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            </View>
           ) : (
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Write something about your day..."
+                placeholder="Écrivez quelque chose sur votre journée..."
                 placeholderTextColor="#aaa"
                 value={text}
                 onChangeText={setText}
@@ -81,7 +110,7 @@ const HomeScreen = ({ navigation }) => {
               />
               <TouchableOpacity 
                 style={[styles.button, text.trim() === '' && styles.buttonDisabled]} 
-                onPress={handleSave}
+                onPress={() => handleSave()}
                 disabled={text.trim() === ''}
               >
                 <MaterialIcons name="send" size={24} color="#fff" />
@@ -90,7 +119,7 @@ const HomeScreen = ({ navigation }) => {
           )}
         </View>
 
-        <Text style={styles.friendsTitle}>Friends Words</Text>
+        <Text style={styles.friendsTitle}>Les mots de vos amis</Text>
         {user.friends.map(item => (
           <TouchableOpacity
             key={item.id}
@@ -100,7 +129,7 @@ const HomeScreen = ({ navigation }) => {
             <Image source={{ uri: item.profileImageUrl }} style={styles.friendAvatar} />
             <View style={styles.friendTextContainer}>
               <Text style={styles.friendName}>{item.username}</Text>
-              <Text style={styles.friendText}>{item.text || 'No entry today'}</Text>
+              <Text style={styles.friendText}>{item.text || 'Pas d\'entrée aujourd\'hui'}</Text>
               <Text style={styles.friendTime}>{item.time || ''} - {item.location}</Text>
             </View>
           </TouchableOpacity>
@@ -240,14 +269,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  friendTime: {
-    fontSize: 12,
-    color: '#888',
-  },
   friendText: {
     fontSize: 14,
-    color: '#333',
-    marginTop: 5,
+    color: '#666',
+  },
+  friendTime: {
+    fontSize: 12,
+    color: '#999',
   },
 });
 

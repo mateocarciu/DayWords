@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { useUser } from '../hooks/UserContext';
 
 const DetailScreen = ({ route }) => {
@@ -11,6 +11,8 @@ const DetailScreen = ({ route }) => {
   const [comments] = useState([
     { id: 1, username: 'Friend1', text: 'Great post!', profileImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg', time: new Date(Date.now() - 30000) },
     { id: 2, username: 'Friend2', text: 'Interesting...', profileImageUrl: 'https://randomuser.me/api/portraits/women/1.jpg', time: new Date(Date.now() - 61000) },
+    { id: 3, username: 'Friend3', text: 'Nice work!', profileImageUrl: 'https://randomuser.me/api/portraits/men/2.jpg', time: new Date(Date.now() - 90000) },
+    { id: 4, username: 'Friend4', text: 'Keep it up!', profileImageUrl: 'https://randomuser.me/api/portraits/women/2.jpg', time: new Date(Date.now() - 120000) },
   ]);
 
   // Function to get elapsed time
@@ -29,21 +31,23 @@ const DetailScreen = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{entry.username}'s Words</Text>
-      <View style={styles.entry}>
-        <Image source={{ uri: entry.profileImageUrl }} style={styles.userAvatar} />
-        <View style={styles.entryContent}>
-          <Text style={styles.entryText}>{entry.text}</Text>
-          <Text style={styles.entryMeta}>{getTimeAgo(new Date(entry.time))} - {entry.location}</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 93 : 0}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>{entry.username}'s Words</Text>
+        <View style={styles.entry}>
+          <Image source={{ uri: entry.profileImageUrl }} style={styles.userAvatar} />
+          <View style={styles.entryContent}>
+            <Text style={styles.entryText}>{entry.text}</Text>
+            <Text style={styles.entryMeta}>{getTimeAgo(new Date(entry.time))} - {entry.location}</Text>
+          </View>
         </View>
-      </View>
-      <Text style={styles.commentsTitle}>Comments</Text>
-      <FlatList
-        data={comments}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.comment}>
+        <Text style={styles.commentsTitle}>Comments</Text>
+        {comments.map((item) => (
+          <View key={item.id} style={styles.comment}>
             <Image source={{ uri: item.profileImageUrl }} style={styles.commentAvatar} />
             <View style={styles.commentTextContainer}>
               <Text style={styles.commentUsername}>{item.username}</Text>
@@ -51,9 +55,8 @@ const DetailScreen = ({ route }) => {
               <Text style={styles.commentText}>{item.text}</Text>
             </View>
           </View>
-        )}
-        style={styles.commentList}
-      />
+        ))}
+      </ScrollView>
       <View style={styles.addCommentContainer}>
         <TextInput
           placeholder="Add a comment..."
@@ -64,20 +67,20 @@ const DetailScreen = ({ route }) => {
         />
         <TouchableOpacity
           style={styles.addCommentButton}
-
         >
           <Text style={styles.addCommentButtonText}>Post</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 20,
-    position: 'relative',
   },
   title: {
     fontSize: 28,
@@ -155,13 +158,14 @@ const styles = StyleSheet.create({
     color: '#333',
     marginTop: 5,
   },
-  commentList: {
-    marginTop: 10,
-  },
   addCommentContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
+    padding: 10,
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+    paddingBottom: 20,
   },
   commentInput: {
     flex: 1,
