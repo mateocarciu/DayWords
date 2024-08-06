@@ -65,7 +65,7 @@ const HomeScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.yourWordsContainer}>
-          <Text style={styles.yourWordsTitle}>Vos mots</Text>
+          <Text style={styles.yourWordsTitle}>Your Words</Text>
           {threadEntries.length > 0 ? (
             <View>
               {threadEntries.slice(0, 1).map((entry, index) => (
@@ -119,7 +119,7 @@ const HomeScreen = ({ navigation }) => {
           )}
         </View>
 
-        <Text style={styles.friendsTitle}>Les mots de vos amis</Text>
+        <Text style={styles.friendsTitle}>Your Friends Words</Text>
         {user.friends.map(item => (
           <TouchableOpacity
             key={item.id}
