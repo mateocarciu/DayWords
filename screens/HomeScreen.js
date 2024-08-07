@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useUser } from '../hooks/UserContext';
+import * as Haptics from 'expo-haptics';
 
 const HomeScreen = ({ navigation }) => {
   const { user, setUser } = useUser();
@@ -19,6 +20,8 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert('Erreur', 'Please type something before saving.');
       return;
     }
+
+    Haptics.selectionAsync(); // Ajout du retour haptique léger
 
     const newEntry = {
       id: user.entries.length + 1,
@@ -49,7 +52,10 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.profileButton}
-          onPress={() => navigation.navigate('Profile')}
+          onPress={() => {
+            Haptics.selectionAsync(); // Ajout du retour haptique léger
+            navigation.navigate('Profile');
+          }}
         >
           <Image
             source={{ uri: user.profileImageUrl }}
@@ -57,6 +63,15 @@ const HomeScreen = ({ navigation }) => {
           />
         </TouchableOpacity>
         <Text style={styles.title}>DayWords</Text>
+        <TouchableOpacity
+          style={styles.friendsButton}
+          onPress={() => {
+            Haptics.selectionAsync(); // Ajout du retour haptique léger
+            navigation.navigate('Friends');
+          }}
+        >
+          <MaterialIcons name="group" size={28} color="#000000" />
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -72,7 +87,10 @@ const HomeScreen = ({ navigation }) => {
                 <TouchableOpacity
                   key={entry.id}
                   style={styles.entry}
-                  onPress={() => navigation.navigate('Detail', { entry })}
+                  onPress={() => {
+                    Haptics.selectionAsync(); // Ajout du retour haptique léger
+                    navigation.navigate('Detail', { entry });
+                  }}
                 >
                   <Text style={styles.entryText}>{entry.text}</Text>
                   <FontAwesome name="arrow-right" size={20} color="#6200ee" style={styles.entryIcon} />
@@ -124,7 +142,10 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity
             key={item.id}
             style={styles.friendEntry}
-            onPress={() => navigation.navigate('Detail', { entry: item })}
+            onPress={() => {
+              Haptics.selectionAsync(); // Ajout du retour haptique léger
+              navigation.navigate('Detail', { entry: item });
+            }}
           >
             <Image source={{ uri: item.profileImageUrl }} style={styles.friendAvatar} />
             <View style={styles.friendTextContainer}>
@@ -142,7 +163,8 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   header: {
     position: 'absolute',
@@ -153,9 +175,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
+  friendsButton: {
+    position: 'absolute',
+    top: 22,
+    left: 20,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   profileButton: {
     position: 'absolute',
-    top: 20,
+    top: 22,
     right: 20,
     width: 50,
     height: 50,
@@ -179,7 +210,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    marginTop: 1,
+    paddingTop: 20,
   },
   scrollContent: {
     paddingTop: 70,

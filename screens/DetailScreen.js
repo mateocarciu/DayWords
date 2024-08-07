@@ -4,8 +4,15 @@ import { useUser } from '../hooks/UserContext';
 
 const DetailScreen = ({ route }) => {
   const { entry } = route.params;
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const [commentText, setCommentText] = useState('');
+
+  // Récupérer le thread entier à partir de l'entrée initiale
+  const getThread = (entryId) => {
+    return user.entries.filter(e => e.parentEntry === entryId || e.id === entryId).sort((a, b) => new Date(a.time) - new Date(b.time));
+  };
+
+  const thread = getThread(entry.id);
 
   // Simulated comments (you can replace this with actual data from your backend)
   const [comments] = useState([
@@ -34,16 +41,23 @@ const DetailScreen = ({ route }) => {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 93 : 0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>{entry.username}'s Words</Text>
-        <View style={styles.entry}>
-          <Image source={{ uri: entry.profileImageUrl }} style={styles.userAvatar} />
-          <View style={styles.entryContent}>
-            <Text style={styles.entryText}>{entry.text}</Text>
-            <Text style={styles.entryMeta}>{getTimeAgo(new Date(entry.time))} - {entry.location}</Text>
-          </View>
+        <View>
+          {thread.map((post, index) => (
+            <View key={post.id}>
+              <View style={styles.entry}>
+                <Image source={{ uri: post.profileImageUrl }} style={styles.userAvatar} />
+                <View style={styles.entryContent}>
+                  <Text style={styles.entryText}>{post.text}</Text>
+                  <Text style={styles.entryMeta}>{getTimeAgo(new Date(post.time))} - {post.location}</Text>
+                </View>
+              </View>
+              {index !== thread.length - 1 && <View style={styles.connector} />}
+            </View>
+          ))}
         </View>
         <Text style={styles.commentsTitle}>Comments</Text>
         {comments.map((item) => (
@@ -89,8 +103,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
   },
+  // threadContainer: {
+  //   paddingLeft: 10,
+  //   borderLeftWidth: 2,
+  //   borderColor: '#6200ee',
+  // },
+  // postContainer: {
+  //   marginBottom: 1,
+  // },
   entry: {
-    marginTop: 25,
     padding: 20,
     borderRadius: 10,
     backgroundColor: '#fff',
@@ -185,6 +206,12 @@ const styles = StyleSheet.create({
   addCommentButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  connector: {
+    height: 20,
+    borderLeftWidth: 2,
+    borderColor: '#6200ee',
+    marginLeft: 36,
   },
 });
 
