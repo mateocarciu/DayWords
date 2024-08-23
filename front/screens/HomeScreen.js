@@ -5,17 +5,58 @@ import { useUser } from '../hooks/UserContext';
 import * as Haptics from 'expo-haptics';
 
 const HomeScreen = ({ navigation }) => {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const [text, setText] = useState('');
   const [threadEntries, setThreadEntries] = useState([]);
+  const [friendsEntries, setFriendsEntries] = useState([]);
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const entry = user.entries.find(e => e.date === today && e.parentEntry === null);
-    setThreadEntries(entry ? [entry, ...user.entries.filter(e => e.parentEntry === entry.id)] : []);
-  }, [user.entries]);
+    const fetchUserEntries = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/entries', {
+          headers: {
+            Authorization: `Bearer ${user.token}`,  // Utilisation du token ici
+          },
+        });
 
-  const handleSave = (parentEntryId = null) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch entries');
+        }
+
+        const entries = await response.json();
+        // Assurez-vous que vous traitez le tableau d'entrées correctement
+        setThreadEntries(entries.filter(entry => !entry.parent_entry_id));
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Error', 'Could not fetch user entries.');
+      }
+    };
+
+    const fetchFriendsEntries = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/friends-entries', {
+          headers: {
+            Authorization: `Bearer ${user.token}`,  // Utilisation du token ici
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch friends entries');
+        }
+
+        const friendsData = await response.json();
+        setFriendsEntries(friendsData);
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Error', 'Could not fetch friends entries.');
+      }
+    };
+
+    fetchUserEntries();
+    fetchFriendsEntries();
+  }, [user]);
+
+  const handleSave = async (parentEntryId = null) => {
     if (text.trim() === '') {
       Alert.alert('Erreur', 'Please type something before saving.');
       return;
@@ -23,23 +64,31 @@ const HomeScreen = ({ navigation }) => {
 
     Haptics.selectionAsync(); // Ajout du retour haptique léger
 
-    const newEntry = {
-      id: user.entries.length + 1,
-      username: user.username,
-      text,
-      time: new Date().toLocaleTimeString(),
-      date: new Date().toISOString().split('T')[0],
-      location: user.location,
-      profileImageUrl: user.profileImageUrl,
-      emotion: null,
-      mediaUrl: '',
-      isPublic: true,
-      parentEntry: parentEntryId,
-      comments: []
-    };
+    try {
+      const response = await fetch('http://localhost:8000/api/entries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({
+          text,
+          parent_entry_id: parentEntryId,
+          mediaUrl: 'aaa',
+        }),
+      });
 
-    setUser({ ...user, entries: [...user.entries, newEntry] });
-    setText('');
+      if (!response.ok) {
+        throw new Error('Failed to save entry');
+      }
+
+      const newEntry = await response.json();
+      setThreadEntries(prev => (parentEntryId ? [...prev, newEntry] : [newEntry, ...prev]));
+      setText('');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Could not save entry.');
+    }
   };
 
   const addThreadEntry = () => {
@@ -83,7 +132,7 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.yourWordsTitle}>Your Words</Text>
           {threadEntries.length > 0 ? (
             <View>
-              {threadEntries.slice(0, 1).map((entry, index) => (
+              {threadEntries.map((entry) => (
                 <TouchableOpacity
                   key={entry.id}
                   style={styles.entry}
@@ -138,23 +187,27 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         <Text style={styles.friendsTitle}>Your Friends Words</Text>
-        {user.friends.map(item => (
-          <TouchableOpacity
-            key={item.id}
-            style={styles.friendEntry}
-            onPress={() => {
-              Haptics.selectionAsync(); // Ajout du retour haptique léger
-              navigation.navigate('Detail', { entry: item });
-            }}
-          >
-            <Image source={{ uri: item.profileImageUrl }} style={styles.friendAvatar} />
-            <View style={styles.friendTextContainer}>
-              <Text style={styles.friendName}>{item.username}</Text>
-              <Text style={styles.friendText}>{item.text || 'No entry today'}</Text>
-              <Text style={styles.friendTime}>{item.time || ''} - {item.location}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {friendsEntries.length > 0 ? (
+          friendsEntries.map(item => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.friendEntry}
+              onPress={() => {
+                Haptics.selectionAsync(); // Ajout du retour haptique léger
+                navigation.navigate('Detail', { entry: item });
+              }}
+            >
+              <Image source={{ uri: item.profileImageUrl }} style={styles.friendAvatar} />
+              <View style={styles.friendTextContainer}>
+                <Text style={styles.friendName}>{item.username}</Text>
+                <Text style={styles.friendText}>{item.text || 'No entry today'}</Text>
+                <Text style={styles.friendTime}>{item.time || ''} - {item.location}</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <Text style={styles.noFriendsText}>No friends' entries found.</Text>
+        )}
       </ScrollView>
     </View>
   );

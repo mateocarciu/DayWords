@@ -1,17 +1,50 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { useUser } from '../hooks/UserContext'; // Importez le hook useUser
+import { useUser } from '../hooks/UserContext';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { user, setUser } = useUser(); // Utilisez le hook useUser pour obtenir user et setUser
+  const { setUser } = useUser();
 
-  const handleLogin = () => {
-    if (email === user.email && password === user.password) {
-      setUser(user);
-      navigation.navigate('Home'); // Redirigez vers la page d'accueil après une connexion réussie
-    } else {
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to log in');
+      }
+
+      const data = await response.json();
+      const { access_token } = data;
+
+      const userResponse = await fetch('http://localhost:8000/api/user', {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+
+      if (!userResponse.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      const userData = await userResponse.json();
+
+      // Stocker l'utilisateur et le token dans le contexte
+      setUser({ data: userData, token: access_token });
+
+      // Rediriger vers la page d'accueil
+      navigation.navigate('Home');
+    } catch (error) {
       Alert.alert('Login Error', 'Invalid credentials. Please try again.');
     }
   };
@@ -102,4 +135,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-
