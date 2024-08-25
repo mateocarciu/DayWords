@@ -20,19 +20,56 @@ const App = () => {
     <UserProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="History" component={HistoryScreen} />
-          <Stack.Screen name="Friends" component={FriendsScreen} />
-          <Stack.Screen name="AddFriend" component={AddFriendScreen} />
-          <Stack.Screen name="Detail" component={DetailScreen} />
+          <Stack.Screen 
+            name="SignUp" 
+            component={SignUpScreen} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="Login" 
+            component={LoginScreen} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="ForgotPassword" 
+            component={ForgotPasswordScreen} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="Home" 
+            component={HomeScreen} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="Profile" 
+            component={ProfileScreen} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="History" 
+            component={HistoryScreen} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="Friends" 
+            component={FriendsScreen} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="AddFriend" 
+            component={AddFriendScreen} 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="Detail" 
+            component={DetailScreen} 
+            options={{ headerShown: false }} 
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
   );
 };
+
 
 export default App;

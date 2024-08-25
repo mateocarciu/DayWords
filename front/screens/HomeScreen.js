@@ -1,99 +1,107 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { useUser } from '../hooks/UserContext';
-import * as Haptics from 'expo-haptics';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Alert,
+} from "react-native";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { useUser } from "../hooks/UserContext";
+import * as Haptics from "expo-haptics";
 
 const HomeScreen = ({ navigation }) => {
   const { user } = useUser();
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [threadEntries, setThreadEntries] = useState([]);
   const [friendsEntries, setFriendsEntries] = useState([]);
 
-  useEffect(() => {
-    const fetchUserEntries = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/api/entries', {
-          headers: {
-            Authorization: `Bearer ${user.token}`,  // Utilisation du token ici
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch entries');
-        }
-
-        const entries = await response.json();
-        // Assurez-vous que vous traitez le tableau d'entrées correctement
-        setThreadEntries(entries.filter(entry => !entry.parent_entry_id));
-      } catch (error) {
-        console.error(error);
-        Alert.alert('Error', 'Could not fetch user entries.');
-      }
-    };
-
-    const fetchFriendsEntries = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/api/friends-entries', {
-          headers: {
-            Authorization: `Bearer ${user.token}`,  // Utilisation du token ici
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch friends entries');
-        }
-
-        const friendsData = await response.json();
-        setFriendsEntries(friendsData);
-      } catch (error) {
-        console.error(error);
-        Alert.alert('Error', 'Could not fetch friends entries.');
-      }
-    };
-
-    fetchUserEntries();
-    fetchFriendsEntries();
-  }, [user]);
-
-  const handleSave = async (parentEntryId = null) => {
-    if (text.trim() === '') {
-      Alert.alert('Erreur', 'Please type something before saving.');
-      return;
-    }
-
-    Haptics.selectionAsync(); // Ajout du retour haptique léger
-
+  // Cette fonction se charge de récupérer les entrées de l'utilisateur
+  const fetchUserEntries = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/entries', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify({
-          text,
-          parent_entry_id: parentEntryId,
-          mediaUrl: 'aaa',
-        }),
+      const response = await fetch("http://localhost:8000/api/entries", {
+        headers: { Authorization: `Bearer ${user.token}` },
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to save entry');
-      }
-
-      const newEntry = await response.json();
-      setThreadEntries(prev => (parentEntryId ? [...prev, newEntry] : [newEntry, ...prev]));
-      setText('');
+      const userEntries = await response.json();
+      setThreadEntries(userEntries.filter((entry) => !entry.parent_entry_id));
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Could not save entry.');
+      console.error("Error fetching user entries:", error);
+      Alert.alert("Error", "Failed to fetch user entries.");
     }
   };
 
+  // Cette fonction se charge de récupérer les entrées des amis
+  const fetchFriendsEntries = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/friends-entries", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const friendsEntries = await response.json();
+      setFriendsEntries(friendsEntries);
+    } catch (error) {
+      console.error("Error fetching friends' entries:", error);
+      Alert.alert("Error", "Failed to fetch friends' entries.");
+    }
+  };
+
+  // Appeler les deux fetchers au chargement initial des données
+  useEffect(() => {
+    if (user.token) {
+      fetchUserEntries();
+      fetchFriendsEntries();
+    }
+  }, [user.token]);
+
+  // Fonction pour sauvegarder une nouvelle entrée et refetch les entrées
+  const handleSaveEntry = async (parentEntryId = null) => {
+    if (text.trim() === "") {
+      Alert.alert("Erreur", "Please type something before saving.");
+      return;
+    }
+
+    Haptics.selectionAsync();
+
+    const newEntryData = {
+      text,
+      parent_entry_id: parentEntryId,
+    };
+
+    try {
+      await saveEntry(newEntryData);
+      setText("");
+      fetchUserEntries(); // Re-fetch seulement les entrées de l'utilisateur
+    } catch (error) {
+      console.error("Error saving entry:", error);
+      Alert.alert("Error", "Could not save entry.");
+    }
+  };
+
+  // Fonction pour ajouter une entrée dans un thread existant
   const addThreadEntry = () => {
     const parentEntryId = threadEntries[0]?.id;
-    handleSave(parentEntryId);
+    handleSaveEntry(parentEntryId);
+  };
+
+  // Fonction pour sauvegarder une entrée via l'API
+  const saveEntry = async (entryData) => {
+    try {
+      const response = await fetch("http://localhost:8000/api/entries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify(entryData),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error("Error saving entry:", error);
+      Alert.alert("Error", "Could not save entry.");
+      throw new Error("Failed to save entry");
+    }
   };
 
   return (
@@ -102,12 +110,12 @@ const HomeScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.profileButton}
           onPress={() => {
-            Haptics.selectionAsync(); // Ajout du retour haptique léger
-            navigation.navigate('Profile');
+            Haptics.selectionAsync();
+            navigation.navigate("Profile");
           }}
         >
           <Image
-            source={{ uri: user.profileImageUrl }}
+            source={{ uri: user.data?.profileImageUrl }}
             style={styles.profileImage}
           />
         </TouchableOpacity>
@@ -115,8 +123,8 @@ const HomeScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.friendsButton}
           onPress={() => {
-            Haptics.selectionAsync(); // Ajout du retour haptique léger
-            navigation.navigate('Friends');
+            Haptics.selectionAsync();
+            navigation.navigate("Friends");
           }}
         >
           <MaterialIcons name="group" size={28} color="#000000" />
@@ -133,21 +141,35 @@ const HomeScreen = ({ navigation }) => {
           {threadEntries.length > 0 ? (
             <View>
               {threadEntries.map((entry) => (
-                <TouchableOpacity
-                  key={entry.id}
-                  style={styles.entry}
-                  onPress={() => {
-                    Haptics.selectionAsync(); // Ajout du retour haptique léger
-                    navigation.navigate('Detail', { entry });
-                  }}
-                >
-                  <Text style={styles.entryText}>{entry.text}</Text>
-                  <FontAwesome name="arrow-right" size={20} color="#6200ee" style={styles.entryIcon} />
-                </TouchableOpacity>
+                <View key={entry.id} style={styles.threadContainer}>
+                  <TouchableOpacity
+                    style={styles.entry}
+                    onPress={() => {
+                      Haptics.selectionAsync();
+                      navigation.navigate("Detail", { entry });
+                    }}
+                  >
+                    <Text style={styles.entryText}>{entry.text}</Text>
+                    <FontAwesome
+                      name="arrow-right"
+                      size={20}
+                      color="#6200ee"
+                      style={styles.entryIcon}
+                    />
+                  </TouchableOpacity>
+                  {entry.child_entries.map((child) => (
+                    <View key={child.id} style={styles.childContainer}>
+                      <View style={styles.threadLine} />
+                      <View style={styles.childEntry}>
+                        <Text style={styles.childEntryText}>{child.text}</Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
               ))}
               <View style={styles.inputContainer}>
                 <TextInput
-                  placeholder="Start a thread..."
+                  placeholder="Need to type something else ?..."
                   placeholderTextColor="#aaa"
                   value={text}
                   onChangeText={setText}
@@ -155,10 +177,13 @@ const HomeScreen = ({ navigation }) => {
                   multiline={true}
                   numberOfLines={4}
                 />
-                <TouchableOpacity 
-                  style={[styles.button, text.trim() === '' && styles.buttonDisabled]} 
+                <TouchableOpacity
+                  style={[
+                    styles.button,
+                    text.trim() === "" && styles.buttonDisabled,
+                  ]}
                   onPress={addThreadEntry}
-                  disabled={text.trim() === ''}
+                  disabled={text.trim() === ""}
                 >
                   <MaterialIcons name="send" size={24} color="#fff" />
                 </TouchableOpacity>
@@ -175,10 +200,13 @@ const HomeScreen = ({ navigation }) => {
                 multiline={true}
                 numberOfLines={4}
               />
-              <TouchableOpacity 
-                style={[styles.button, text.trim() === '' && styles.buttonDisabled]} 
-                onPress={() => handleSave()}
-                disabled={text.trim() === ''}
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  text.trim() === "" && styles.buttonDisabled,
+                ]}
+                onPress={() => handleSaveEntry()}
+                disabled={text.trim() === ""}
               >
                 <MaterialIcons name="send" size={24} color="#fff" />
               </TouchableOpacity>
@@ -188,25 +216,32 @@ const HomeScreen = ({ navigation }) => {
 
         <Text style={styles.friendsTitle}>Your Friends Words</Text>
         {friendsEntries.length > 0 ? (
-          friendsEntries.map(item => (
+          friendsEntries.map((item) => (
             <TouchableOpacity
               key={item.id}
               style={styles.friendEntry}
               onPress={() => {
-                Haptics.selectionAsync(); // Ajout du retour haptique léger
-                navigation.navigate('Detail', { entry: item });
+                Haptics.selectionAsync();
+                navigation.navigate("Detail", { entry: item });
               }}
             >
-              <Image source={{ uri: item.profileImageUrl }} style={styles.friendAvatar} />
+              <Image
+                source={{ uri: item.profileImageUrl }}
+                style={styles.friendAvatar}
+              />
               <View style={styles.friendTextContainer}>
                 <Text style={styles.friendName}>{item.username}</Text>
-                <Text style={styles.friendText}>{item.text || 'No entry today'}</Text>
-                <Text style={styles.friendTime}>{item.time || ''} - {item.location}</Text>
+                <Text style={styles.friendText}>
+                  {item.text || "No entry today"}
+                </Text>
+                <Text style={styles.friendTime}>
+                  {item.time || ""} - {item.location}
+                </Text>
               </View>
             </TouchableOpacity>
           ))
         ) : (
-          <Text style={styles.noFriendsText}>No friends' entries found.</Text>
+          <Text style={styles.noFriendsText}>No friends entries found.</Text>
         )}
       </ScrollView>
     </View>
@@ -220,34 +255,34 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   header: {
-    position: 'absolute',
-    top: 0,
+    position: "absolute",
+    top: 15,
     left: 0,
     right: 0,
     padding: 10,
-    alignItems: 'center',
+    alignItems: "center",
     zIndex: 1,
   },
   friendsButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 22,
     left: 20,
     width: 50,
     height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   profileButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 22,
     right: 20,
     width: 50,
     height: 50,
     borderRadius: 25,
-    overflow: 'hidden',
-    backgroundColor: '#6200ee',
-    justifyContent: 'center',
-    alignItems: 'center',
+    overflow: "hidden",
+    backgroundColor: "#6200ee",
+    justifyContent: "center",
+    alignItems: "center",
   },
   profileImage: {
     width: 50,
@@ -256,10 +291,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 20,
-    textAlign: 'center',
-    color: '#333',
+    textAlign: "center",
+    color: "#333",
   },
   scrollView: {
     flex: 1,
@@ -273,15 +308,15 @@ const styles = StyleSheet.create({
   },
   yourWordsTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginTop: 25,
@@ -289,54 +324,79 @@ const styles = StyleSheet.create({
   textArea: {
     flex: 1,
     paddingVertical: 10,
-    color: '#333',
-    textAlignVertical: 'top',
+    color: "#333",
+    textAlignVertical: "top",
   },
   button: {
-    backgroundColor: '#6200ee',
+    backgroundColor: "#6200ee",
     padding: 10,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: 10,
   },
   buttonDisabled: {
-    backgroundColor: '#aaa',
+    backgroundColor: "#aaa",
+  },
+  threadContainer: {
+    marginTop: 25,
+    paddingBottom: 15,
   },
   entry: {
-    marginTop: 25,
     padding: 20,
     borderRadius: 10,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
+    backgroundColor: "#fff",
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
     elevation: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   entryText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     flex: 1,
   },
   entryIcon: {
     marginLeft: 10,
   },
+  childContainer: {
+    flexDirection: "row",
+    marginTop: 10,
+  },
+  threadLine: {
+    width: 2,
+    backgroundColor: "#ddd",
+    marginLeft: 28,
+    marginTop: -5,
+    marginBottom: -5,
+  },
+  childEntry: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#f9f9f9",
+    marginLeft: 10,
+    flex: 1,
+  },
+  childEntryText: {
+    fontSize: 14,
+    color: "#555",
+  },
   friendsTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 25,
     marginBottom: 10,
   },
   friendEntry: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    backgroundColor: '#fff',
+    borderBottomColor: "#ddd",
+    backgroundColor: "#fff",
     borderRadius: 10,
     marginVertical: 5,
   },
@@ -351,15 +411,15 @@ const styles = StyleSheet.create({
   },
   friendName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   friendText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   friendTime: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
   },
 });
 

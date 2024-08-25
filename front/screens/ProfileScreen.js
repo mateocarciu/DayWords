@@ -1,10 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useUser } from '../hooks/UserContext'; // Importez le hook useUser
+import { useUser } from '../hooks/UserContext';
 
 const ProfileScreen = ({ navigation }) => {
-  const { user } = useUser(); // Utilisez le hook useUser pour accéder aux données utilisateur
+  const { user, logout } = useUser(); // Récupérez la fonction logout
+
+  const handleLogout = async () => {
+    await logout();
+    navigation.replace('Login');
+  };
 
   return (
     <View style={styles.container}>
@@ -15,11 +20,15 @@ const ProfileScreen = ({ navigation }) => {
         <MaterialIcons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
       <View style={styles.profileContainer}>
-        <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
-        <Text style={styles.username}>{user.username}</Text>
-        <Text style={styles.location}>{user.location}</Text>
-        <Text style={styles.bio}>{user.bio}</Text>
+        <Image source={{ uri: user.data?.profileImageUrl }} style={styles.profileImage} />
+        <Text style={styles.username}>{user.data?.username}</Text>
+        <Text style={styles.location}>{user.data?.location}</Text>
+        <Text style={styles.bio}>{user.data?.bio}</Text>
       </View>
+      {/* Ajoutez le bouton de déconnexion */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -64,6 +73,19 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 10,
     textAlign: 'center',
+  },
+  logoutButton: {
+    marginTop: 20,
+    backgroundColor: '#ff0000',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '100%',
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

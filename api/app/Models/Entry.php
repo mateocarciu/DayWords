@@ -7,20 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+// Entry.php
+
 class Entry extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'text',
-        'time',
-        'date',
         'location',
         'emotion',
         'mediaUrl',
         'public',
         'parent_entry_id',
-        'user_id',  // Ajout de la clé étrangère user_id
+        'user_id',
     ];
 
     public function user(): BelongsTo
@@ -41,5 +41,11 @@ class Entry extends Model
     public function childEntries(): HasMany
     {
         return $this->hasMany(Entry::class, 'parent_entry_id');
+    }
+
+    // Scope pour les entrées racines
+    public function scopeRootEntries($query)
+    {
+        return $query->whereNull('parent_entry_id');
     }
 }

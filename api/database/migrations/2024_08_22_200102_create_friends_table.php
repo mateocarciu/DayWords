@@ -19,9 +19,11 @@ class CreateFriendsTable extends Migration
             $table->unsignedBigInteger('friend_id');
             $table->timestamps();
 
-            // Foreign keys and unique constraint to avoid duplicate relationships
+            // Clés étrangères
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('friend_id')->references('id')->on('users')->onDelete('cascade');
+
+            // Empêcher la duplication d'amis
             $table->unique(['user_id', 'friend_id']);
         });
     }
@@ -36,4 +38,3 @@ class CreateFriendsTable extends Migration
         Schema::dropIfExists('friends');
     }
 }
-

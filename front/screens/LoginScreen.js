@@ -1,11 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../hooks/UserContext';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { setUser } = useUser();
+
+  useEffect(() => {
+    const checkUserLoggedIn = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem('user');
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          setUser(user);
+          navigation.navigate('Home');
+        }
+      } catch (error) {
+        console.error('Failed to load user data', error);
+      }
+    };
+
+    checkUserLoggedIn();
+  }, []);
 
   const handleLogin = async () => {
     try {
@@ -39,8 +57,10 @@ const LoginScreen = ({ navigation }) => {
 
       const userData = await userResponse.json();
 
-      // Stocker l'utilisateur et le token dans le contexte
-      setUser({ data: userData, token: access_token });
+      // Stocker l'utilisateur et le token dans le contexte et AsyncStorage
+      const userToStore = { data: userData, token: access_token };
+      setUser(userToStore);
+      await AsyncStorage.setItem('user', JSON.stringify(userToStore));
 
       // Rediriger vers la page d'accueil
       navigation.navigate('Home');

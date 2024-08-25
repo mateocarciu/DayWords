@@ -1,26 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useUser } from '../hooks/UserContext';
+import { MaterialIcons } from '@expo/vector-icons';
 
-const DetailScreen = ({ route }) => {
+
+const DetailScreen = ({ route, navigation }) => {
   const { entry } = route.params;
   const { user } = useUser();
   const [commentText, setCommentText] = useState('');
+  const [comments, setComments] = useState([]);
 
-  // Récupérer le thread entier à partir de l'entrée initiale
-  const getThread = (entryId) => {
-    return user.entries.filter(e => e.parentEntry === entryId || e.id === entryId).sort((a, b) => new Date(a.time) - new Date(b.time));
+  useEffect(() => {
+    if (user.token && entry.id) {
+      fetchComments();
+    }
+  }, [user.token, entry.id]);
+
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/comments/${entry.id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await response.json();
+      setComments(data);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      Alert.alert("Error", "Failed to fetch comments.");
+    }
   };
-
-  const thread = getThread(entry.id);
-
-  // Simulated comments (you can replace this with actual data from your backend)
-  const [comments] = useState([
-    { id: 1, username: 'Friend1', text: 'Great post!', profileImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg', time: new Date(Date.now() - 30000) },
-    { id: 2, username: 'Friend2', text: 'Interesting...', profileImageUrl: 'https://randomuser.me/api/portraits/women/1.jpg', time: new Date(Date.now() - 61000) },
-    { id: 3, username: 'Friend3', text: 'Nice work!', profileImageUrl: 'https://randomuser.me/api/portraits/men/2.jpg', time: new Date(Date.now() - 90000) },
-    { id: 4, username: 'Friend4', text: 'Keep it up!', profileImageUrl: 'https://randomuser.me/api/portraits/women/2.jpg', time: new Date(Date.now() - 120000) },
-  ]);
 
   // Function to get elapsed time
   const getTimeAgo = (date) => {
@@ -43,29 +50,48 @@ const DetailScreen = ({ route }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
     >
+      <TouchableOpacity 
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="#fff" />
+      </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>{entry.username}'s Words</Text>
-        <View>
-          {thread.map((post, index) => (
-            <View key={post.id}>
-              <View style={styles.entry}>
-                <Image source={{ uri: post.profileImageUrl }} style={styles.userAvatar} />
-                <View style={styles.entryContent}>
-                  <Text style={styles.entryText}>{post.text}</Text>
-                  <Text style={styles.entryMeta}>{getTimeAgo(new Date(post.time))} - {post.location}</Text>
-                </View>
+        <Text style={styles.title}>{user.data.username}'s Words</Text>
+        {entry && (
+          <View>
+            <View style={styles.entry}>
+              <Image source={{ uri: user.data.profileImageUrl }} style={styles.userAvatar} />
+              <View style={styles.entryContent}>
+                <Text style={styles.entryText}>{entry.text}</Text>
+                <Text style={styles.entryMeta}>
+                  {getTimeAgo(new Date(entry.created_at))} {entry?.location}
+                </Text>
               </View>
-              {index !== thread.length - 1 && <View style={styles.connector} />}
             </View>
-          ))}
-        </View>
+            {entry.child_entries.map((child_entry, index) => (
+              <View key={child_entry.id}>
+                <View style={styles.connector} />
+                <View style={styles.entry}>
+                  <View style={styles.entryContent}>
+                    <Text style={styles.entryText}>{child_entry.text}</Text>
+                    <Text style={styles.entryMeta}>
+                      {getTimeAgo(new Date(child_entry.created_at))} {entry?.location}
+                    </Text>
+                  </View>
+                </View>
+                {index !== entry.child_entries.length - 1 && <View style={styles.connector} />}
+              </View>
+            ))}
+          </View>
+        )}
         <Text style={styles.commentsTitle}>Comments</Text>
         {comments.map((item) => (
           <View key={item.id} style={styles.comment}>
-            <Image source={{ uri: item.profileImageUrl }} style={styles.commentAvatar} />
+            <Image source={{ uri: item.user.profileImageUrl }} style={styles.commentAvatar} />
             <View style={styles.commentTextContainer}>
-              <Text style={styles.commentUsername}>{item.username}</Text>
-              <Text style={styles.commentTime}>{getTimeAgo(new Date(item.time))}</Text>
+              <Text style={styles.commentUsername}>{item.user.username}</Text>
+              <Text style={styles.commentTime}>{getTimeAgo(new Date(item.created_at))}</Text>
               <Text style={styles.commentText}>{item.text}</Text>
             </View>
           </View>
@@ -103,14 +129,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
   },
-  // threadContainer: {
-  //   paddingLeft: 10,
-  //   borderLeftWidth: 2,
-  //   borderColor: '#6200ee',
-  // },
-  // postContainer: {
-  //   marginBottom: 1,
-  // },
   entry: {
     padding: 20,
     borderRadius: 10,
@@ -212,6 +230,15 @@ const styles = StyleSheet.create({
     borderLeftWidth: 2,
     borderColor: '#6200ee',
     marginLeft: 36,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: '#6200ee',
+    padding: 10,
+    borderRadius: 20,
+    zIndex: 10,
   },
 });
 
