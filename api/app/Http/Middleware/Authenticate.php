@@ -21,9 +21,12 @@ class Authenticate
 
     protected function unauthenticated($request, array $guards)
 {
+    info('test');
     if ($request->expectsJson()) {
         return response()->json(['message' => 'Unauthenticated.'], 401);
     }
+
+
 
     throw new AuthenticationException(
         'Unauthenticated.', $guards, $this->redirectTo($request)

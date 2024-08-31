@@ -35,9 +35,25 @@ class User extends Authenticatable
 
     public function friends(): BelongsToMany
     {
+        // Les amis où l'utilisateur est dans la colonne `user_id`
         return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')
-                    ->withTimestamps();  // Ajout de timestamps pour les amitiés
+                    ->withTimestamps();
     }
+    
+    // public function inverseFriends(): BelongsToMany
+    // {
+    //     // Les amis où l'utilisateur est dans la colonne `friend_id`
+    //     return $this->belongsToMany(User::class, 'friends', 'friend_id', 'user_id')
+    //                 ->withTimestamps();
+    // }
+
+    // return $this->friends()->get()->merge($this->inverseFriends()->get());
+
+
+    public function allFriends()
+{
+    return $this->friends()->get();
+}
 
     public function sentFriendRequests(): HasMany
     {

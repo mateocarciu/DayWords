@@ -1,19 +1,49 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useUser } from '../hooks/UserContext';
+import { API_URL } from '../config';
 
 const AddFriendScreen = ({ navigation }) => {
+  const { user } = useUser();
   const [friendEmail, setFriendEmail] = useState('');
 
-  const handleAddFriend = () => {
+  const handleAddFriend = async () => {
     if (friendEmail.trim() === '') {
       Alert.alert('Erreur', 'Please enter a valid email address.');
       return;
     }
 
-    // Logique pour ajouter un ami (plus tard, on utilisera une API)
-    // For now, just reset the email and go back
-    setFriendEmail('');
-    navigation.goBack();
+    try {
+      const response = await fetch(`${API_URL}/friends/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ email: friendEmail }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          Alert.alert('Erreur', 'User not found.');
+        } else if (response.status === 409) {
+          Alert.alert('Erreur', 'Friend request already exists.');
+        } else {
+          throw new Error("Failed to send friend request");
+        }
+        return;
+      }
+
+      const data = await response.json();
+      Alert.alert('Succès', 'Friend request sent.');
+      setFriendEmail(''); // Clear the input field
+      navigation.goBack();
+
+    } catch (error) {
+      console.error("Error adding friend:", error);
+      Alert.alert("Erreur", "Could not send friend request.");
+    }
   };
 
   return (

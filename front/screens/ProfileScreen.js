@@ -12,13 +12,18 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <MaterialIcons name="arrow-back" size={24} color="#fff" />
-      </TouchableOpacity>
+    <View style={styles.container}>      
+      <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <MaterialIcons name="arrow-back" size={20} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Profile</Text>
+      </View>
+
+
       <View style={styles.profileContainer}>
         <Image source={{ uri: user.data?.profileImageUrl }} style={styles.profileImage} />
         <Text style={styles.username}>{user.data?.username}</Text>
@@ -39,15 +44,6 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    backgroundColor: '#6200ee',
-    padding: 10,
-    borderRadius: 20,
-    zIndex: 10,
   },
   profileContainer: {
     alignItems: 'center',
@@ -86,6 +82,33 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  headerContainer: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    right: 0,
+    height: 80,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    zIndex: 10,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+  },
+  backButton: {
+    backgroundColor: '#6200ee',
+    padding: 10,
+    borderRadius: 30,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    flex: 1,
   },
 });
 

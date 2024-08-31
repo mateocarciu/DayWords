@@ -81,4 +81,18 @@ class EntryController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function getFriendsEntries(Request $request)
+    {
+        // Récupérer les entrées des amis, avec les utilisateurs et les enfants
+        $friendsEntries =  Auth::user()->allFriends()
+            ->load(['entries' => function ($query) {
+                $query->whereNull('parent_entry_id')
+                    ->with('user', 'childEntries');
+            }])
+            ->pluck('entries')
+            ->flatten();
+
+        return response()->json($friendsEntries);
+    }
 }

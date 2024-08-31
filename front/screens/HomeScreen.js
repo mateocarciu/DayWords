@@ -12,18 +12,53 @@ import {
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "../hooks/UserContext";
 import * as Haptics from "expo-haptics";
+import { API_URL } from '../config';
+import EventSource from 'react-native-sse';
 
 const HomeScreen = ({ navigation }) => {
   const { user } = useUser();
   const [text, setText] = useState("");
   const [threadEntries, setThreadEntries] = useState([]);
   const [friendsEntries, setFriendsEntries] = useState([]);
+  const [messages, setMessages] = useState([]);
 
-  // Cette fonction se charge de récupérer les entrées de l'utilisateur
+  // useEffect(() => {
+  //   const fetchSSE = async () => {
+  //     const response = await fetch(`${API_URL}/sse`, {
+  //       headers: {
+  //         Accept: 'application/json',
+  //         Authorization: `Bearer ${user.token}`
+  //       }
+  //     });
+  
+  //     const reader = response.body.getReader();
+  //     const decoder = new TextDecoder("utf-8");
+  
+  //     while (true) {
+  //       const { done, value } = await reader.read();
+  //       if (done) break;
+  
+  //       const text = decoder.decode(value);
+  //       console.log(text); // Parse this as needed
+  //     }
+  //   };
+  
+  //   fetchSSE().catch(console.error);
+  
+  //   return () => {
+  //     // Cleanup logic if needed
+  //   };
+  // }, [user.token]);
+
+
+  // Fetch user entries
   const fetchUserEntries = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/entries", {
-        headers: { Authorization: `Bearer ${user.token}` },
+      const response = await fetch(`${API_URL}/entries`, {
+        headers: { 
+          Accept: 'application/json',
+          Authorization: `Bearer ${user.token}`  
+        },
       });
       const userEntries = await response.json();
       setThreadEntries(userEntries.filter((entry) => !entry.parent_entry_id));
@@ -33,11 +68,12 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // Cette fonction se charge de récupérer les entrées des amis
+  // Fetch friends' entries
   const fetchFriendsEntries = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/friends-entries", {
-        headers: { Authorization: `Bearer ${user.token}` },
+      const response = await fetch(`${API_URL}/friends-entries`, {
+        headers: { Accept: 'application/json',
+          Authorization: `Bearer ${user.token}`  },
       });
       const friendsEntries = await response.json();
       setFriendsEntries(friendsEntries);
@@ -47,7 +83,7 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // Appeler les deux fetchers au chargement initial des données
+  // Call fetchers on initial load
   useEffect(() => {
     if (user.token) {
       fetchUserEntries();
@@ -55,7 +91,7 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [user.token]);
 
-  // Fonction pour sauvegarder une nouvelle entrée et refetch les entrées
+  // Save entry
   const handleSaveEntry = async (parentEntryId = null) => {
     if (text.trim() === "") {
       Alert.alert("Erreur", "Please type something before saving.");
@@ -72,31 +108,33 @@ const HomeScreen = ({ navigation }) => {
     try {
       await saveEntry(newEntryData);
       setText("");
-      fetchUserEntries(); // Re-fetch seulement les entrées de l'utilisateur
+      fetchUserEntries();
     } catch (error) {
       console.error("Error saving entry:", error);
       Alert.alert("Error", "Could not save entry.");
     }
   };
 
-  // Fonction pour ajouter une entrée dans un thread existant
+  // Add thread entry
   const addThreadEntry = () => {
     const parentEntryId = threadEntries[0]?.id;
     handleSaveEntry(parentEntryId);
   };
 
-  // Fonction pour sauvegarder une entrée via l'API
+  // Save entry via API
   const saveEntry = async (entryData) => {
     try {
-      const response = await fetch("http://localhost:8000/api/entries", {
+      const response = await fetch(`${API_URL}/entries`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
+          Accept: 'application/json',
+          Authorization: `Bearer ${user.token}` ,
         },
         body: JSON.stringify(entryData),
       });
       return await response.json();
+      
     } catch (error) {
       console.error("Error saving entry:", error);
       Alert.alert("Error", "Could not save entry.");
@@ -104,8 +142,32 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const navigateToDetail = (entryId) => {
+    Haptics.selectionAsync();
+    navigation.navigate("Detail", { entryId });
+  };
+
+  const getTimeAgo = (date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    } else {
+      return `${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`;
+    }
+  };
+
   return (
     <View style={styles.container}>
+          <View>
+      {messages.map((message, index) => (
+        <Text key={index}>{message.message} - {message.timestamp}</Text>
+      ))}
+    </View>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.profileButton}
@@ -144,10 +206,7 @@ const HomeScreen = ({ navigation }) => {
                 <View key={entry.id} style={styles.threadContainer}>
                   <TouchableOpacity
                     style={styles.entry}
-                    onPress={() => {
-                      Haptics.selectionAsync();
-                      navigation.navigate("Detail", { entry });
-                    }}
+                    onPress={() => navigateToDetail(entry.id)}
                   >
                     <Text style={styles.entryText}>{entry.text}</Text>
                     <FontAwesome
@@ -157,7 +216,7 @@ const HomeScreen = ({ navigation }) => {
                       style={styles.entryIcon}
                     />
                   </TouchableOpacity>
-                  {entry.child_entries.map((child) => (
+                  {entry.child_entries.slice(0, 1).map((child) => (
                     <View key={child.id} style={styles.childContainer}>
                       <View style={styles.threadLine} />
                       <View style={styles.childEntry}>
@@ -165,6 +224,16 @@ const HomeScreen = ({ navigation }) => {
                       </View>
                     </View>
                   ))}
+                  {entry.child_entries.length > 1 && (
+                    <View style={styles.childContainer}>
+                      <View style={styles.threadLine} />
+                      <View style={styles.childEntry}>
+                        <Text style={styles.childEntryText}>
+                          +{entry.child_entries.length - 1}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
                 </View>
               ))}
               <View style={styles.inputContainer}>
@@ -216,29 +285,50 @@ const HomeScreen = ({ navigation }) => {
 
         <Text style={styles.friendsTitle}>Your Friends Words</Text>
         {friendsEntries.length > 0 ? (
-          friendsEntries.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.friendEntry}
-              onPress={() => {
-                Haptics.selectionAsync();
-                navigation.navigate("Detail", { entry: item });
-              }}
-            >
-              <Image
-                source={{ uri: item.profileImageUrl }}
-                style={styles.friendAvatar}
-              />
-              <View style={styles.friendTextContainer}>
-                <Text style={styles.friendName}>{item.username}</Text>
-                <Text style={styles.friendText}>
-                  {item.text || "No entry today"}
-                </Text>
-                <Text style={styles.friendTime}>
-                  {item.time || ""} - {item.location}
-                </Text>
-              </View>
-            </TouchableOpacity>
+          friendsEntries.map((entry) => (
+            <View key={entry.id} style={styles.threadContainer}>
+              <TouchableOpacity
+                style={styles.friendEntry}
+                onPress={() => navigateToDetail(entry.id)}
+              >
+                <Image
+                  source={{ uri: entry.user.profileImageUrl }}
+                  style={styles.friendAvatar}
+                />
+                <View style={styles.friendTextContainer}>
+                  <Text style={styles.friendName}>{entry.user.username}</Text>
+                  <Text style={styles.friendText}>
+                    {entry.text || "No entry today"}
+                  </Text>
+                  <Text style={styles.friendTime}>
+                    {getTimeAgo(new Date(entry.created_at))} {entry.location}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              {entry.child_entries.slice(0, 1).map((child, index) => (
+                <View key={child.id} style={styles.childContainer}>
+                  <View style={styles.threadLine} />
+                  <View style={styles.childEntry}>
+                    <Text style={styles.childEntryText}>{child.text}</Text>
+                    <Text style={styles.childEntryMeta}>
+                      <Text style={styles.friendTime}>
+                        {getTimeAgo(new Date(child.created_at))} {child.location}
+                      </Text>
+                    </Text>
+                  </View>
+                </View>
+              ))}
+              {entry.child_entries.length > 1 && (
+                <View style={styles.childContainer}>
+                  <View style={styles.threadLine} />
+                  <View style={styles.childEntry}>
+                    <Text style={styles.childEntryText}>
+                      +{entry.child_entries.length - 1}
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </View>
           ))
         ) : (
           <Text style={styles.noFriendsText}>No friends entries found.</Text>
@@ -302,6 +392,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: 70,
+    paddingBottom: 40,
   },
   yourWordsContainer: {
     marginBottom: 25,
@@ -340,7 +431,7 @@ const styles = StyleSheet.create({
   },
   threadContainer: {
     marginTop: 25,
-    paddingBottom: 15,
+    paddingBottom: 5,
   },
   entry: {
     padding: 20,
