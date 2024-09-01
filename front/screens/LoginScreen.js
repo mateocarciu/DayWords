@@ -18,6 +18,10 @@ const LoginScreen = ({ navigation }) => {
           const user = JSON.parse(storedUser);
           setUser(user);
           navigation.navigate('Home');
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home' }],
+          });
         }
       } catch (error) {
         console.error('Failed to load user data', error);
@@ -39,33 +43,24 @@ const LoginScreen = ({ navigation }) => {
           password,
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to log in');
       }
-
+  
       const data = await response.json();
-      const { access_token } = data;
-
-      const userResponse = await fetch(`${API_URL}/user`, {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      });
-
-      if (!userResponse.ok) {
-        throw new Error('Failed to fetch user data');
-      }
-
-      const userData = await userResponse.json();
-
+      const { access_token, user } = data;
+  
       // Stocker l'utilisateur et le token dans le contexte et AsyncStorage
-      const userToStore = { data: userData, token: access_token };
+      const userToStore = { data: user, token: access_token };
       setUser(userToStore);
       await AsyncStorage.setItem('user', JSON.stringify(userToStore));
-
+  
       // Rediriger vers la page d'accueil
-      navigation.navigate('Home');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Home' }],
+      });
     } catch (error) {
       Alert.alert('Login Error', 'Invalid credentials. Please try again.');
     }

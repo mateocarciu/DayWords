@@ -12,11 +12,12 @@ use App\Http\Controllers\SseController; // <-- Ajoutez ce contrôleur
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+
     Route::apiResource('/entries', EntryController::class);
     Route::apiResource('/friends', FriendController::class);
     Route::get('/friends-entries', [EntryController::class, 'getFriendsEntries']);
@@ -27,5 +28,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/comments/{entryId}', [CommentController::class, 'store']);
 
     // Route pour les Server-Sent Events
-    Route::get('/sse', [SseController::class, 'stream']); // <-- Nouvelle route SSE
+    Route::get('/sse', [SseController::class, 'stream']);
 });

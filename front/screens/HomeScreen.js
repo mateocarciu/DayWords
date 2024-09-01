@@ -13,42 +13,25 @@ import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "../hooks/UserContext";
 import * as Haptics from "expo-haptics";
 import { API_URL } from '../config';
-import EventSource from 'react-native-sse';
 
 const HomeScreen = ({ navigation }) => {
   const { user } = useUser();
   const [text, setText] = useState("");
   const [threadEntries, setThreadEntries] = useState([]);
   const [friendsEntries, setFriendsEntries] = useState([]);
-  const [messages, setMessages] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchSSE = async () => {
-  //     const response = await fetch(`${API_URL}/sse`, {
-  //       headers: {
-  //         Accept: 'application/json',
-  //         Authorization: `Bearer ${user.token}`
-  //       }
-  //     });
-  
-  //     const reader = response.body.getReader();
-  //     const decoder = new TextDecoder("utf-8");
-  
-  //     while (true) {
-  //       const { done, value } = await reader.read();
-  //       if (done) break;
-  
-  //       const text = decoder.decode(value);
-  //       console.log(text); // Parse this as needed
-  //     }
-  //   };
-  
-  //   fetchSSE().catch(console.error);
-  
-  //   return () => {
-  //     // Cleanup logic if needed
-  //   };
-  // }, [user.token]);
+  // Call fetchers on initial load and every 20 seconds
+  useEffect(() => {
+    if (user.token) {
+      fetchUserEntries();
+      fetchFriendsEntries();
+      const interval = setInterval(() => {
+        fetchUserEntries();
+        fetchFriendsEntries();
+      }, 20000);
+      return () => clearInterval(interval);
+    }
+  }, [user.token]);
 
 
   // Fetch user entries
@@ -163,11 +146,6 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-          <View>
-      {messages.map((message, index) => (
-        <Text key={index}>{message.message} - {message.timestamp}</Text>
-      ))}
-    </View>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.profileButton}
@@ -479,7 +457,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginTop: 25,
-    marginBottom: 10,
   },
   friendEntry: {
     flexDirection: "row",
