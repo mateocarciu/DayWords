@@ -1,17 +1,15 @@
-# Installer Expo CLI globalement
+# Back
+```
+composer install
+```
+
+# Front
 
 ```
 yarn install -g expo-cli
 ```
-
-# Installer les packages nécessaires
 ```
 yarn install
-```
-
-# Installer les packages nécessaires
-```
-composer install
 ```
 
 # Lancer le projet
