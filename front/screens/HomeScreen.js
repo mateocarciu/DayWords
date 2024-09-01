@@ -28,7 +28,7 @@ const HomeScreen = ({ navigation }) => {
       const interval = setInterval(() => {
         fetchUserEntries();
         fetchFriendsEntries();
-      }, 20000);
+      }, 2000);
       return () => clearInterval(interval);
     }
   }, [user.token]);
@@ -321,10 +321,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 20,
     paddingRight: 20,
+    paddingTop: 20,
   },
   header: {
     position: "absolute",
-    top: 15,
+    top: 30,
     left: 0,
     right: 0,
     padding: 10,

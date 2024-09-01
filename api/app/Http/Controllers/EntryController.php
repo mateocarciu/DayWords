@@ -44,7 +44,7 @@ class EntryController extends Controller
     // Montre une entrée spécifique
     public function show($id)
     {
-        $entry = Entry::with(['comments', 'childEntries'])->findOrFail($id);  // Chargement des sous-entrées
+        $entry = Entry::with(['comments', 'childEntries', 'user'])->findOrFail($id);  // Chargement des sous-entrées
         return response()->json($entry);
     }
 

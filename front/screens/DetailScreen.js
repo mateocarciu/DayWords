@@ -95,7 +95,7 @@ const DetailScreen = ({ route, navigation }) => {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+      // keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
     >
       <View style={styles.headerContainer}>
         <TouchableOpacity 
@@ -112,7 +112,7 @@ const DetailScreen = ({ route, navigation }) => {
           <>
             <View>
               <View style={styles.entry}>
-                <Image source={{ uri: user.data.profileImageUrl }} style={styles.userAvatar} />
+                <Image source={{ uri: entry.user.profileImageUrl }} style={styles.userAvatar} />
                 <View style={styles.entryContent}>
                   <Text style={styles.entryText}>{entry.text}</Text>
                   <Text style={styles.entryMeta}>
