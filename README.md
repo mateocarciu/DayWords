@@ -8,6 +8,12 @@ yarn install -g expo-cli
 ```
 yarn install
 ```
+
+# Installer les packages nécessaires
+```
+composer install
+```
+
 # Lancer le projet
 ```
 yarn expo start or yarn start
