@@ -141,10 +141,9 @@ const FriendsScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity 
-          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialIcons name="arrow-back" size={20} color="#fff" />
+          <MaterialIcons name="arrow-back" size={22} color="#000000" />
         </TouchableOpacity>
         <Text style={styles.title}>DayWords</Text>
       </View>
@@ -263,7 +262,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     position: 'absolute',
-    top: 20,
+    top: 30,
     left: 0,
     right: 0,
     height: 80,
@@ -276,11 +275,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
-  },
-  backButton: {
-    backgroundColor: '#6200ee',
-    padding: 10,
-    borderRadius: 20,
   },
   title: {
     fontSize: 24,

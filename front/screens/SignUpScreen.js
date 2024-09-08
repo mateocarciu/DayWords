@@ -1,18 +1,43 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Image, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { API_URL } from '../config';
+
 
 const SignUpScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [profileImage, setProfileImage] = useState(null);
 
-  const handleSignUp = () => {
-    // Logique pour l'inscription (à implémenter)
-    Alert.alert('Sign Up', 'User registered successfully');
-    navigation.navigate('Login');
+  const handleSignUp = async () => {
+    try {
+      const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({ 
+          username: username,
+          name: name,
+          email: email,
+          password: password,
+          password_confirmation: passwordConfirmation
+
+        }),
+      });
+      if (!response.ok) {
+      Alert.alert('OOPS Couldnt register')
+      }
+      Alert.alert('Sign Up', 'User registered successfully');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error("Error adding friend:", error);
+      Alert.alert("Erreur", "Could not send friend request.");
+    }
   };
 
   const selectImage = async () => {
@@ -67,6 +92,14 @@ const SignUpScreen = ({ navigation }) => {
           placeholderTextColor="#aaa"
           value={password}
           onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Password confirmation"
+          placeholderTextColor="#aaa"
+          value={passwordConfirmation}
+          onChangeText={setPasswordConfirmation}
           secureTextEntry
           style={styles.input}
         />

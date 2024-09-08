@@ -99,10 +99,9 @@ const DetailScreen = ({ route, navigation }) => {
     >
       <View style={styles.headerContainer}>
         <TouchableOpacity 
-          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialIcons name="arrow-back" size={20} color="#fff" />
+          <MaterialIcons name="arrow-back" size={22} color="#000000" />
         </TouchableOpacity>
         <Text style={styles.title}>{user.data.username}'s Words</Text>
       </View>
@@ -163,7 +162,9 @@ const DetailScreen = ({ route, navigation }) => {
           style={styles.addCommentButton}
           onPress={postComment}
         >
-          <Text style={styles.addCommentButtonText}>Post</Text>
+          {/* <Text style={styles.addCommentButtonText}>Post</Text> */}
+          <MaterialIcons name="send" size={22} color="#fff" />
+
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -176,29 +177,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   scrollContent: {
-    paddingTop: 100, // Ajustez ceci en fonction de la hauteur du header
+    paddingTop: 120, // Ajustez ceci en fonction de la hauteur du header
     padding: 20,
   },
   headerContainer: {
     position: 'absolute',
-    top: 20,
+    top: 30,
     left: 0,
     right: 0,
     height: 80,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    zIndex: 10,
+    zIndex: 1,
     elevation: 10,
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
-  },
-  backButton: {
-    backgroundColor: '#6200ee',
-    padding: 10,
-    borderRadius: 30,
   },
   title: {
     fontSize: 24,
@@ -247,8 +243,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
     backgroundColor: '#fff',
     borderRadius: 10,
     marginVertical: 5,

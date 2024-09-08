@@ -28,13 +28,18 @@ class FriendController extends Controller
 
     public function store(Request $request) {
         $user = Auth::user();
-        $friendEmail = $request->input('email');
+        $friendUsername = $request->input('username');
 
         // Vérifier si l'utilisateur existe
-        $friend = User::where('email', $friendEmail)->first();
+        $friend = User::where('username', $friendUsername)->first();
 
         if (!$friend) {
             return response()->json(['message' => 'User not found'], 404);
+        }
+
+        // pour pas pouvoir s'ajouter soit meme
+        if ($user->id == $friend->id) {
+            return response()->json(['message' => 'You cannot be friend with yourself'], 403);
         }
 
         // Vérifier si une demande d'ami existe déjà

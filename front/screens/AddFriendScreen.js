@@ -5,11 +5,11 @@ import { API_URL } from '../config';
 
 const AddFriendScreen = ({ navigation }) => {
   const { user } = useUser();
-  const [friendEmail, setFriendEmail] = useState('');
+  const [friendUsername, setfriendUsername] = useState('');
 
   const handleAddFriend = async () => {
-    if (friendEmail.trim() === '') {
-      Alert.alert('Erreur', 'Please enter a valid email address.');
+    if (friendUsername.trim() === '') {
+      Alert.alert('Erreur', 'Please enter a valid username.');
       return;
     }
 
@@ -21,7 +21,7 @@ const AddFriendScreen = ({ navigation }) => {
           Accept: 'application/json',
           Authorization: `Bearer ${user.token}`,
         },
-        body: JSON.stringify({ email: friendEmail }),
+        body: JSON.stringify({ username: friendUsername }),
       });
 
       if (!response.ok) {
@@ -37,7 +37,7 @@ const AddFriendScreen = ({ navigation }) => {
 
       const data = await response.json();
       Alert.alert('Succès', 'Friend request sent.');
-      setFriendEmail(''); // Clear the input field
+      setfriendUsername(''); // Clear the input field
       navigation.goBack();
 
     } catch (error) {
@@ -51,16 +51,16 @@ const AddFriendScreen = ({ navigation }) => {
       <Text style={styles.title}>Add Friend</Text>
       <TextInput
         placeholder="Friend's Email"
-        value={friendEmail}
-        onChangeText={setFriendEmail}
+        value={friendUsername}
+        onChangeText={setfriendUsername}
         style={styles.input}
         keyboardType="email-address"
         autoCapitalize="none"
       />
       <TouchableOpacity
-        style={[styles.button, friendEmail.trim() === '' && styles.buttonDisabled]}
+        style={[styles.button, friendUsername.trim() === '' && styles.buttonDisabled]}
         onPress={handleAddFriend}
-        disabled={friendEmail.trim() === ''}
+        disabled={friendUsername.trim() === ''}
       >
         <Text style={styles.buttonText}>Add</Text>
       </TouchableOpacity>

@@ -17,7 +17,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-
     Route::apiResource('/entries', EntryController::class);
     Route::apiResource('/friends', FriendController::class);
     Route::get('/friends-entries', [EntryController::class, 'getFriendsEntries']);
@@ -28,5 +27,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/comments/{entryId}', [CommentController::class, 'store']);
 
     // Route pour les Server-Sent Events
-    Route::get('/sse', [SseController::class, 'stream']);
+    // Route::get('/sse', [SseController::class, 'stream']);
 });

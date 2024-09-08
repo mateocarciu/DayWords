@@ -20,7 +20,7 @@ const HomeScreen = ({ navigation }) => {
   const [threadEntries, setThreadEntries] = useState([]);
   const [friendsEntries, setFriendsEntries] = useState([]);
 
-  // Call fetchers on initial load and every 20 seconds
+  // Call fetchers on initial load and every 5 seconds
   useEffect(() => {
     if (user.token) {
       fetchUserEntries();
@@ -28,7 +28,7 @@ const HomeScreen = ({ navigation }) => {
       const interval = setInterval(() => {
         fetchUserEntries();
         fetchFriendsEntries();
-      }, 2000);
+      }, 5000);
       return () => clearInterval(interval);
     }
   }, [user.token]);
@@ -321,7 +321,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 20,
     paddingRight: 20,
-    paddingTop: 20,
   },
   header: {
     position: "absolute",
@@ -367,7 +366,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 40,
   },
   scrollContent: {
     paddingTop: 70,
@@ -416,13 +415,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
+    // shadowColor: "#000",
+    // shadowOpacity: 0.1,
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowRadius: 8,
     elevation: 5,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "center"
   },
   entryText: {
     fontSize: 16,
@@ -463,8 +462,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    // borderBottomWidth: 1,
+    // borderBottomColor: "#ddd",
     backgroundColor: "#fff",
     borderRadius: 10,
     marginVertical: 5,
