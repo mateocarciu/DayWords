@@ -2,6 +2,9 @@
 ```
 composer install
 ```
+```
+php artisan serve
+```
 
 # Front
 
