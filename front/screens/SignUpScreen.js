@@ -13,33 +13,46 @@ const SignUpScreen = ({ navigation }) => {
   const [profileImage, setProfileImage] = useState(null);
 
   const handleSignUp = async () => {
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('password_confirmation', passwordConfirmation);
+    formData.append('profileImage' , profileImage);
+    // Vérifiez si l'image est présente et formatez-la correctement
+    // if (profileImage) {
+    //   const uriParts = profileImage.split('.');
+    //   const fileType = uriParts[uriParts.length - 1];
+  
+    //   formData.append('profileImage', {
+    //     uri: profileImage,
+    //     name: `profile.${fileType}`,
+    //     type: `image/${fileType}`,
+    //   });
+    // }
+  
     try {
-      const response = await fetch(`${API_URL}/register`, {
+      const response = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
+          Accept: 'application/json',
+          // Ne pas définir 'Content-Type' ici car FormData s'en charge
         },
-        body: JSON.stringify({ 
-          username: username,
-          name: name,
-          email: email,
-          password: password,
-          password_confirmation: passwordConfirmation
-
-        }),
+        body: formData,
       });
+  
       if (!response.ok) {
-      Alert.alert('OOPS Couldnt register')
+        Alert.alert('OOPS Couldn\'t register');
+      } else {
+        Alert.alert('Sign Up', 'User registered successfully');
+        navigation.navigate('Login');
       }
-      Alert.alert('Sign Up', 'User registered successfully');
-      navigation.navigate('Login');
     } catch (error) {
-      console.error("Error adding friend:", error);
-      Alert.alert("Erreur", "Could not send friend request.");
+      console.error("Error during registration:", error);
+      Alert.alert("Erreur", "Registration failed.");
     }
   };
-
   const selectImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,

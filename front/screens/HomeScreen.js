@@ -37,7 +37,7 @@ const HomeScreen = ({ navigation }) => {
   // Fetch user entries
   const fetchUserEntries = async () => {
     try {
-      const response = await fetch(`${API_URL}/entries`, {
+      const response = await fetch(`${API_URL}/api/entries`, {
         headers: { 
           Accept: 'application/json',
           Authorization: `Bearer ${user.token}`  
@@ -54,7 +54,7 @@ const HomeScreen = ({ navigation }) => {
   // Fetch friends' entries
   const fetchFriendsEntries = async () => {
     try {
-      const response = await fetch(`${API_URL}/friends-entries`, {
+      const response = await fetch(`${API_URL}/api/friends-entries`, {
         headers: { Accept: 'application/json',
           Authorization: `Bearer ${user.token}`  },
       });
@@ -107,7 +107,7 @@ const HomeScreen = ({ navigation }) => {
   // Save entry via API
   const saveEntry = async (entryData) => {
     try {
-      const response = await fetch(`${API_URL}/entries`, {
+      const response = await fetch(`${API_URL}/api/entries`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -155,7 +155,7 @@ const HomeScreen = ({ navigation }) => {
           }}
         >
           <Image
-            source={{ uri: user.data?.profileImageUrl }}
+            source={{ uri: API_URL + user.data?.profileImageUrl }}
             style={styles.profileImage}
           />
         </TouchableOpacity>
@@ -270,7 +270,7 @@ const HomeScreen = ({ navigation }) => {
                 onPress={() => navigateToDetail(entry.id)}
               >
                 <Image
-                  source={{ uri: entry.user.profileImageUrl }}
+                  source={{ uri: API_URL + entry.user.profileImageUrl }}
                   style={styles.friendAvatar}
                 />
                 <View style={styles.friendTextContainer}>

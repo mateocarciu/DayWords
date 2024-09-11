@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useUser } from '../hooks/UserContext';
+import { MaterialIcons } from '@expo/vector-icons';
 import { API_URL } from '../config';
+import * as Haptics from "expo-haptics";
 
 const AddFriendScreen = ({ navigation }) => {
   const { user } = useUser();
@@ -14,7 +16,7 @@ const AddFriendScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/friends/add`, {
+      const response = await fetch(`${API_URL}/api/friends/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +50,18 @@ const AddFriendScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add Friend</Text>
+      <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => {
+              Haptics.selectionAsync();
+              navigation.goBack();
+            }}
+          >
+            <MaterialIcons name="arrow-back" size={28} color="#000000" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Add a friend</Text>
+      </View>
       <TextInput
         placeholder="Friend's Email"
         value={friendUsername}
@@ -74,12 +87,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
   },
   input: {
     width: '100%',
@@ -108,6 +115,33 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  header: {
+    position: 'absolute',
+    top: 30,
+    left: 0,
+    right: 0,
+    height: 80,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 4,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    top: 25,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
   },
 });
 

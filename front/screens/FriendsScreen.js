@@ -4,6 +4,8 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { useUser } from '../hooks/UserContext';
 import { API_URL } from '../config';
+import * as Haptics from "expo-haptics";
+
 
 const FriendsList = ({ friends, navigation }) => (
   <FlatList
@@ -78,7 +80,7 @@ const FriendsScreen = ({ navigation }) => {
 
   const fetchUserFriends = async () => {
     try {
-      const response = await fetch(`${API_URL}/friends`, {
+      const response = await fetch(`${API_URL}/api/friends`, {
         headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${user.token}`,
@@ -95,7 +97,7 @@ const FriendsScreen = ({ navigation }) => {
 
   const fetchFriendRequests = async () => {
     try {
-      const response = await fetch(`${API_URL}/friend-requests`, {
+      const response = await fetch(`${API_URL}/api/friend-requests`, {
         headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${user.token}`,
@@ -112,7 +114,7 @@ const FriendsScreen = ({ navigation }) => {
 
   const handleRequest = async (id, action) => {
     try {
-      const response = await fetch(`${API_URL}/friend-requests/${id}`, {
+      const response = await fetch(`${API_URL}/api/friend-requests/${id}`, {
         method: 'PATCH',
         headers: {
           Accept: 'application/json',
@@ -139,13 +141,17 @@ const FriendsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity 
-          onPress={() => navigation.goBack()}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => {
+            Haptics.selectionAsync();
+            navigation.goBack();
+          }}
         >
-          <MaterialIcons name="arrow-back" size={22} color="#000000" />
+          <MaterialIcons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
-        <Text style={styles.title}>DayWords</Text>
+        <Text style={styles.title}>Friends</Text>
       </View>
       <View style={styles.tabViewContainer}>
         <TabView
@@ -177,11 +183,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
-    paddingTop: 80, // Ajout d'un padding pour éviter le chevauchement
+    paddingTop: 120,
   },
   tabViewContainer: {
     flex: 1,
-    marginTop: 20, // Ajoute un peu d'espace au-dessus du TabView
     marginHorizontal: 15, // Ajoute des marges sur les côtés pour un effet de carte
     borderRadius: 10, // Arrondit les coins du TabView
     overflow: 'hidden', // Assure que le contenu reste dans les limites arrondies
@@ -260,27 +265,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  headerContainer: {
+  header: {
     position: 'absolute',
     top: 30,
     left: 0,
     right: 0,
     height: 80,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    zIndex: 10,
-    elevation: 10,
+    justifyContent: 'center',
+    zIndex: 1,
+    elevation: 5,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 4,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    top: 25,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,
+    color: '#333',
   },
 });
 

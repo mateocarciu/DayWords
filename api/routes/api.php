@@ -7,7 +7,8 @@ use App\Http\Controllers\EntryController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\SseController; // <-- Ajoutez ce contrôleur
+// use App\Http\Controllers\SseController;
+// use App\Http\Controllers\ImageController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -25,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/friend-requests/{id}', [FriendController::class, 'handleFriendRequest']);
     Route::get('/comments/{entryId}', [CommentController::class, 'show']);
     Route::post('/comments/{entryId}', [CommentController::class, 'store']);
+    // Route::get('/profile-image/{filename}', [ImageController::class, 'show']);
 
     // Route pour les Server-Sent Events
     // Route::get('/sse', [SseController::class, 'stream']);

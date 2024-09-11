@@ -2,6 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useUser } from '../hooks/UserContext';
+import * as Haptics from "expo-haptics";
+import { API_URL } from '../config';
+
+
 
 const ProfileScreen = ({ navigation }) => {
   const { user, logout } = useUser(); // Récupérez la fonction logout
@@ -17,19 +21,22 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>      
-      <View style={styles.headerContainer}>
-        <TouchableOpacity 
+      <View style={styles.header}>
+        <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => {
+            Haptics.selectionAsync();
+            navigation.goBack();
+          }}
         >
-          <MaterialIcons name="arrow-back" size={22} color="#000000" />
+          <MaterialIcons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
         <Text style={styles.title}>Profile</Text>
       </View>
 
 
       <View style={styles.profileContainer}>
-        <Image source={{ uri: user.data?.profileImageUrl }} style={styles.profileImage} />
+        <Image source={{ uri: API_URL + user.data?.profileImageUrl }} style={styles.profileImage} />
         <Text style={styles.username}>{user.data?.username}</Text>
         <Text style={styles.location}>{user.data?.location}</Text>
         <Text style={styles.bio}>{user.data?.bio}</Text>
@@ -87,27 +94,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  headerContainer: {
+  header: {
     position: 'absolute',
     top: 30,
     left: 0,
     right: 0,
     height: 80,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    zIndex: 10,
-    elevation: 10,
+    justifyContent: 'center',
+    zIndex: 1,
+    elevation: 5,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 4,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    top: 25,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,
+    color: '#333',
   },
 });
 

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity,
 import { useUser } from '../hooks/UserContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { API_URL } from '../config';
-
+import * as Haptics from "expo-haptics";
 
 const DetailScreen = ({ route, navigation }) => {
   const { entryId } = route.params; // Récupérez l'ID de l'entrée
@@ -21,7 +21,7 @@ const DetailScreen = ({ route, navigation }) => {
 
   const fetchEntryDetails = async () => {
     try {
-      const response = await fetch(`${API_URL}/entries/${entryId}`, {
+      const response = await fetch(`${API_URL}/api/entries/${entryId}`, {
         headers: { Accept: 'application/json',
           Authorization: `Bearer ${user.token}`  },
       });
@@ -35,7 +35,7 @@ const DetailScreen = ({ route, navigation }) => {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`${API_URL}/comments/${entryId}`, {
+      const response = await fetch(`${API_URL}/api/comments/${entryId}`, {
         headers: { Accept: 'application/json',
           Authorization: `Bearer ${user.token}`  },
       });
@@ -54,7 +54,7 @@ const DetailScreen = ({ route, navigation }) => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/comments/${entryId}`, {
+      const response = await fetch(`${API_URL}/api/comments/${entryId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,11 +97,15 @@ const DetailScreen = ({ route, navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       // keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
     >
-      <View style={styles.headerContainer}>
-        <TouchableOpacity 
-          onPress={() => navigation.goBack()}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => {
+            Haptics.selectionAsync();
+            navigation.goBack();
+          }}
         >
-          <MaterialIcons name="arrow-back" size={22} color="#000000" />
+          <MaterialIcons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
         <Text style={styles.title}>{user.data.username}'s Words</Text>
       </View>
@@ -111,7 +115,7 @@ const DetailScreen = ({ route, navigation }) => {
           <>
             <View>
               <View style={styles.entry}>
-                <Image source={{ uri: entry.user.profileImageUrl }} style={styles.userAvatar} />
+                <Image source={{ uri: API_URL + entry.user.profileImageUrl }} style={styles.userAvatar} />
                 <View style={styles.entryContent}>
                   <Text style={styles.entryText}>{entry.text}</Text>
                   <Text style={styles.entryMeta}>
@@ -137,7 +141,7 @@ const DetailScreen = ({ route, navigation }) => {
             <Text style={styles.commentsTitle}>Comments</Text>
             {comments.map((item) => (
               <View key={item.id} style={styles.comment}>
-                <Image source={{ uri: item.user.profileImageUrl }} style={styles.commentAvatar} />
+                <Image source={{ uri: API_URL + item.user.profileImageUrl }} style={styles.commentAvatar} />
                 <View style={styles.commentTextContainer}>
                   <Text style={styles.commentUsername}>{item.user.username}</Text>
                   <Text style={styles.commentTime}>{getTimeAgo(new Date(item.created_at))}</Text>
@@ -180,27 +184,32 @@ const styles = StyleSheet.create({
     paddingTop: 120, // Ajustez ceci en fonction de la hauteur du header
     padding: 20,
   },
-  headerContainer: {
+  header: {
     position: 'absolute',
     top: 30,
     left: 0,
     right: 0,
     height: 80,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    justifyContent: 'center',
     zIndex: 1,
-    elevation: 10,
+    elevation: 5,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 4,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    top: 25,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,
+    color: '#333',
   },
   entry: {
     padding: 20,
