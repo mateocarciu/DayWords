@@ -11,6 +11,7 @@ import HistoryScreen from './screens/HistoryScreen';
 import FriendsScreen from './screens/FriendsScreen';
 import AddFriendScreen from './screens/AddFriendScreen';
 import DetailScreen from './screens/DetailScreen';
+import UserProfileScreen from './screens/UserProfileScreen';
 import { UserProvider } from './hooks/UserContext'; // Importez le UserProvider
 
 const Stack = createStackNavigator();
@@ -64,6 +65,11 @@ const App = () => {
             name="Detail" 
             component={DetailScreen} 
             options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name="UserProfile" 
+            component={UserProfileScreen} 
+            options={{ headerShown: false }}
           />
         </Stack.Navigator>
       </NavigationContainer>

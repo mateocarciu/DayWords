@@ -13,7 +13,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
 
-        info($request);
+        
         // Validation des champs du formulaire
         $request->validate([
             'username' => 'required|string|max:255|unique:users',
@@ -24,9 +24,9 @@ class AuthController extends Controller
         ]);
     
         $profileImageUrl = null; // Initialisation de l'URL de l'image
-    
+        
         // Si l'image est présente dans la requête
-        if ($request->profileImage) {
+        if ($request->profileImage != 'null') {
             // Extraire le type mime et les données encodées en base64
             $imageParts = explode(';base64,', $request->profileImage);
             if (count($imageParts) === 2) {
@@ -50,14 +50,16 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Invalid image format.'], 422);
             }
         }
-    
+
         // Créer l'utilisateur avec les informations
-        $user = User::create([
+        User::create([
             'username' => $request->username,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'profileImageUrl' => $profileImageUrl,  // Enregistrer l'URL de l'image
+            // 'profileImageUrl' => $profileImageUrl ?? '/storage/profile_images/fakeuser.png',
+            'profileImageUrl' => $profileImageUrl,
+
         ]);
     
         return response()->json(['message' => 'User registered successfully!'], 201);
@@ -79,6 +81,10 @@ class AuthController extends Controller
         }
     
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // if ($user->profileImageUrl == null) {
+        //     $user->profileImageUrl =  '/storage/profile_images/fakeuser.png';
+        // }
     
         // Retourner le token ainsi que les informations de l'utilisateur
         return response()->json([

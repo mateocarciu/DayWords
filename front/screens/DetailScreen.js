@@ -90,32 +90,64 @@ const DetailScreen = ({ route, navigation }) => {
       return `${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`;
     }
   };
+  const navigateToUserProfile = (userId) => {
+    Haptics.selectionAsync();
+    if (userId === user.data.id) {
+      navigation.navigate('Profile'); // Redirection vers la page ProfileScreen
+      return;
+    }
+    navigation.navigate('UserProfile', { userId }); // Redirection vers la page UserProfileScreen avec l'ID de l'utilisateur
+  };
 
+  // Fonction pour obtenir les initiales
+  const getInitials = (username) => {
+    if (!username) return ''; // Si le nom d'utilisateur est vide
+    const nameParts = username.split(' ');
+    if (nameParts.length === 1) {
+      return nameParts[0][0].toUpperCase(); // Si une seule partie, retourne la première lettre
+    }
+    return (
+      nameParts[0][0].toUpperCase() + nameParts[1][0].toUpperCase() // Retourne les deux premières lettres des noms
+    );
+  };
+    
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      // keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
-    >
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => {
             Haptics.selectionAsync();
             navigation.goBack();
-          }}
-        >
+          }}>
           <MaterialIcons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
-        <Text style={styles.title}>{user.data.username}'s Words</Text>
+        <Text style={styles.title}>
+          {entry && entry.user ? (entry.user.id === user.data.id ? "Your Words" : `${entry.user.username}'s Words`) : "Loading..."}
+        </Text>
       </View>
-
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {entry ? (
           <>
             <View>
               <View style={styles.entry}>
-                <Image source={{ uri: API_URL + entry.user.profileImageUrl }} style={styles.userAvatar} />
+              <TouchableOpacity onPress={() => navigateToUserProfile(entry.user.id)}>
+                { entry.user?.profileImageUrl ? (
+                  <Image
+                    source={{ uri: API_URL +  entry.user?.profileImageUrl }}
+                    style={styles.profileImage}
+                  />
+                ) : (
+                  // Si aucune image de profil n'est disponible, créer une vue avec les initiales
+                  <View style={styles.profilePlaceholder}>
+                    <Text style={styles.profileInitials}>
+                      {getInitials( entry.user.username)}
+                    </Text>
+                  </View>
+                )}
+                </TouchableOpacity>
                 <View style={styles.entryContent}>
                   <Text style={styles.entryText}>{entry.text}</Text>
                   <Text style={styles.entryMeta}>
@@ -141,7 +173,26 @@ const DetailScreen = ({ route, navigation }) => {
             <Text style={styles.commentsTitle}>Comments</Text>
             {comments.map((item) => (
               <View key={item.id} style={styles.comment}>
-                <Image source={{ uri: API_URL + item.user.profileImageUrl }} style={styles.commentAvatar} />
+                <TouchableOpacity onPress={() => navigateToUserProfile(item.user.id)}>
+                  <Image
+                    source={{ uri: API_URL + item.user.profileImageUrl }}
+                    style={styles.userAvatar}
+                  />
+
+                { item.user?.profileImageUrl ? (
+                    <Image
+                      source={{ uri: API_URL + item.user?.profileImageUrl }}
+                      style={styles.profileImage}
+                    />
+                  ) : (
+                    // Si aucune image de profil n'est disponible, créer une vue avec les initiales
+                    <View style={styles.profilePlaceholder}>
+                      <Text style={styles.profileInitials}>
+                        {getInitials( item.user.username)}
+                      </Text>
+                    </View>
+                )}
+                </TouchableOpacity>
                 <View style={styles.commentTextContainer}>
                   <Text style={styles.commentUsername}>{item.user.username}</Text>
                   <Text style={styles.commentTime}>{getTimeAgo(new Date(item.created_at))}</Text>
@@ -166,7 +217,6 @@ const DetailScreen = ({ route, navigation }) => {
           style={styles.addCommentButton}
           onPress={postComment}
         >
-          {/* <Text style={styles.addCommentButtonText}>Post</Text> */}
           <MaterialIcons name="send" size={22} color="#fff" />
 
         </TouchableOpacity>
@@ -224,11 +274,26 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 0,
   },
-  userAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Pour arrondir l'image
     marginRight: 10,
+  },
+  profilePlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#FF5733', // Couleur de fond par défaut
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+
+  },
+  profileInitials: {
+    color: '#FFFFFF', // Couleur du texte
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   entryContent: {
     flex: 1,

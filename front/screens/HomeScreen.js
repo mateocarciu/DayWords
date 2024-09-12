@@ -130,6 +130,11 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("Detail", { entryId });
   };
 
+  const navigateToUserProfile = (userId) => {
+    Haptics.selectionAsync();
+    navigation.navigate('UserProfile', { userId }); // Redirection vers la page UserProfileScreen avec l'ID de l'utilisateur
+  };
+
   const getTimeAgo = (date) => {
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
@@ -144,6 +149,18 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+    // Fonction pour obtenir les initiales
+  const getInitials = (username) => {
+    if (!username) return ''; // Si le nom d'utilisateur est vide
+    const nameParts = username.split(' ');
+    if (nameParts.length === 1) {
+      return nameParts[0][0].toUpperCase(); // Si une seule partie, retourne la première lettre
+    }
+    return (
+      nameParts[0][0].toUpperCase() + nameParts[1][0].toUpperCase() // Retourne les deux premières lettres des noms
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -154,12 +171,23 @@ const HomeScreen = ({ navigation }) => {
             navigation.navigate("Profile");
           }}
         >
-          <Image
-            source={{ uri: API_URL + user.data?.profileImageUrl }}
-            style={styles.profileImage}
-          />
+          {user.data?.profileImageUrl ? (
+            <Image
+              source={{ uri: API_URL + user.data.profileImageUrl }}
+              style={styles.profileImage}
+            />
+          ) : (
+            // Si aucune image de profil n'est disponible, créer une vue avec les initiales
+            <View style={styles.profilePlaceholder}>
+              <Text style={styles.profileInitials}>
+                {getInitials(user.data?.username)}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
+
         <Text style={styles.title}>DayWords</Text>
+
         <TouchableOpacity
           style={styles.friendsButton}
           onPress={() => {
@@ -170,7 +198,6 @@ const HomeScreen = ({ navigation }) => {
           <MaterialIcons name="group" size={28} color="#000000" />
         </TouchableOpacity>
       </View>
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -181,11 +208,11 @@ const HomeScreen = ({ navigation }) => {
           {threadEntries.length > 0 ? (
             <View>
               {threadEntries.map((entry) => (
-                <View key={entry.id} style={styles.threadContainer}>
-                  <TouchableOpacity
-                    style={styles.entry}
-                    onPress={() => navigateToDetail(entry.id)}
-                  >
+                <TouchableOpacity
+                  key={entry.id}
+                  style={styles.threadContainer}
+                  onPress={() => navigateToDetail(entry.id)}>
+                  <View style={styles.entry}>
                     <Text style={styles.entryText}>{entry.text}</Text>
                     <FontAwesome
                       name="arrow-right"
@@ -193,26 +220,28 @@ const HomeScreen = ({ navigation }) => {
                       color="#6200ee"
                       style={styles.entryIcon}
                     />
-                  </TouchableOpacity>
-                  {entry.child_entries.slice(0, 1).map((child) => (
-                    <View key={child.id} style={styles.childContainer}>
-                      <View style={styles.threadLine} />
-                      <View style={styles.childEntry}>
-                        <Text style={styles.childEntryText}>{child.text}</Text>
+                  </View>
+                  <View>
+                    {entry.child_entries.slice(0, 1).map((child) => (
+                      <View key={child.id} style={styles.childContainer}>
+                        <View style={styles.threadLine} />
+                        <View style={styles.childEntry}>
+                          <Text style={styles.childEntryText}>{child.text}</Text>
+                        </View>
                       </View>
-                    </View>
-                  ))}
-                  {entry.child_entries.length > 1 && (
-                    <View style={styles.childContainer}>
-                      <View style={styles.threadLine} />
-                      <View style={styles.childEntry}>
-                        <Text style={styles.childEntryText}>
-                          +{entry.child_entries.length - 1}
-                        </Text>
+                    ))}
+                    {entry.child_entries.length > 1 && (
+                      <View style={styles.childContainer}>
+                        <View style={styles.threadLine} />
+                        <View style={styles.childEntry}>
+                          <Text style={styles.childEntryText}>
+                            +{entry.child_entries.length - 1}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                  )}
-                </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
               ))}
               <View style={styles.inputContainer}>
                 <TextInput
@@ -264,15 +293,28 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.friendsTitle}>Your Friends Words</Text>
         {friendsEntries.length > 0 ? (
           friendsEntries.map((entry) => (
-            <View key={entry.id} style={styles.threadContainer}>
-              <TouchableOpacity
-                style={styles.friendEntry}
-                onPress={() => navigateToDetail(entry.id)}
-              >
-                <Image
-                  source={{ uri: API_URL + entry.user.profileImageUrl }}
-                  style={styles.friendAvatar}
-                />
+            <TouchableOpacity
+              key={entry.id}
+              style={styles.threadContainer}
+              onPress={() => navigateToDetail(entry.id)}
+            >
+              <View style={styles.friendEntry}>
+                <TouchableOpacity onPress={() => navigateToUserProfile(entry.user.id)}>
+                {entry.user?.profileImageUrl ? (
+                  <Image
+                    source={{ uri: API_URL + entry.user.profileImageUrl }}
+                    style={styles.friendProfileImage}
+                  />
+                ) : (
+                  // Si aucune image de profil n'est disponible, créer une vue avec les initiales
+                  <View style={styles.friendProfilePlaceholder}>
+                    <Text style={styles.profileInitials}>
+                      {getInitials(entry.user?.username)}
+                    </Text>
+                  </View>
+                )}
+
+                </TouchableOpacity>
                 <View style={styles.friendTextContainer}>
                   <Text style={styles.friendName}>{entry.user.username}</Text>
                   <Text style={styles.friendText}>
@@ -282,8 +324,8 @@ const HomeScreen = ({ navigation }) => {
                     {getTimeAgo(new Date(entry.created_at))} {entry.location}
                   </Text>
                 </View>
-              </TouchableOpacity>
-              {entry.child_entries.slice(0, 1).map((child, index) => (
+              </View>
+              {entry.child_entries.slice(0, 1).map((child) => (
                 <View key={child.id} style={styles.childContainer}>
                   <View style={styles.threadLine} />
                   <View style={styles.childEntry}>
@@ -306,7 +348,7 @@ const HomeScreen = ({ navigation }) => {
                   </View>
                 </View>
               )}
-            </View>
+            </TouchableOpacity>
           ))
         ) : (
           <Text style={styles.noFriendsText}>No friends entries found.</Text>
@@ -334,7 +376,7 @@ const styles = StyleSheet.create({
   friendsButton: {
     position: "absolute",
     top: 22,
-    left: 20,
+    left: 10,
     width: 50,
     height: 50,
     justifyContent: "center",
@@ -352,11 +394,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
+  // profileImage: {
+  //   width: 50,
+  //   height: 50,
+  //   borderRadius: 25,
+  // },
   title: {
     fontSize: 28,
     fontWeight: "bold",
@@ -462,17 +504,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
-    // borderBottomWidth: 1,
-    // borderBottomColor: "#ddd",
     backgroundColor: "#fff",
     borderRadius: 10,
     marginVertical: 5,
-  },
-  friendAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
   },
   friendTextContainer: {
     flex: 1,
@@ -488,6 +522,39 @@ const styles = StyleSheet.create({
   friendTime: {
     fontSize: 12,
     color: "#999",
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Pour arrondir l'image
+  },
+  friendProfileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Pour arrondir l'image
+    marginRight: 10,
+  },
+  profilePlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#FF5733', // Couleur de fond par défaut
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  friendProfilePlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#FF5733', // Couleur de fond par défaut
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  profileInitials: {
+    color: '#FFFFFF', // Couleur du texte
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });
 
