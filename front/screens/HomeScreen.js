@@ -13,6 +13,7 @@ import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "../hooks/UserContext";
 import * as Haptics from "expo-haptics";
 import { API_URL } from '../config';
+import ProfilePicture from '../components/ProfilePicture';
 
 const HomeScreen = ({ navigation }) => {
   const { user } = useUser();
@@ -149,18 +150,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-    // Fonction pour obtenir les initiales
-  const getInitials = (username) => {
-    if (!username) return ''; // Si le nom d'utilisateur est vide
-    const nameParts = username.split(' ');
-    if (nameParts.length === 1) {
-      return nameParts[0][0].toUpperCase(); // Si une seule partie, retourne la première lettre
-    }
-    return (
-      nameParts[0][0].toUpperCase() + nameParts[1][0].toUpperCase() // Retourne les deux premières lettres des noms
-    );
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -171,23 +160,13 @@ const HomeScreen = ({ navigation }) => {
             navigation.navigate("Profile");
           }}
         >
-          {user.data?.profileImageUrl ? (
-            <Image
-              source={{ uri: API_URL + user.data.profileImageUrl }}
-              style={styles.profileImage}
-            />
-          ) : (
-            // Si aucune image de profil n'est disponible, créer une vue avec les initiales
-            <View style={styles.profilePlaceholder}>
-              <Text style={styles.profileInitials}>
-                {getInitials(user.data?.username)}
-              </Text>
-            </View>
-          )}
+          <ProfilePicture 
+            profileImageUrl={user.data?.profileImageUrl} 
+            username={user.data?.username} 
+            size={50} 
+          />
         </TouchableOpacity>
-
         <Text style={styles.title}>DayWords</Text>
-
         <TouchableOpacity
           style={styles.friendsButton}
           onPress={() => {
@@ -296,24 +275,15 @@ const HomeScreen = ({ navigation }) => {
             <TouchableOpacity
               key={entry.id}
               style={styles.threadContainer}
-              onPress={() => navigateToDetail(entry.id)}
-            >
+              onPress={() => navigateToDetail(entry.id)}>
               <View style={styles.friendEntry}>
                 <TouchableOpacity onPress={() => navigateToUserProfile(entry.user.id)}>
-                {entry.user?.profileImageUrl ? (
-                  <Image
-                    source={{ uri: API_URL + entry.user.profileImageUrl }}
-                    style={styles.friendProfileImage}
+                  <ProfilePicture 
+                    profileImageUrl={entry.user.profileImageUrl} 
+                    username={entry.user.username} 
+                    size={50}
+                    hasMarginRight
                   />
-                ) : (
-                  // Si aucune image de profil n'est disponible, créer une vue avec les initiales
-                  <View style={styles.friendProfilePlaceholder}>
-                    <Text style={styles.profileInitials}>
-                      {getInitials(entry.user?.username)}
-                    </Text>
-                  </View>
-                )}
-
                 </TouchableOpacity>
                 <View style={styles.friendTextContainer}>
                   <Text style={styles.friendName}>{entry.user.username}</Text>
@@ -522,39 +492,6 @@ const styles = StyleSheet.create({
   friendTime: {
     fontSize: 12,
     color: "#999",
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Pour arrondir l'image
-  },
-  friendProfileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Pour arrondir l'image
-    marginRight: 10,
-  },
-  profilePlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#FF5733', // Couleur de fond par défaut
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  friendProfilePlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#FF5733', // Couleur de fond par défaut
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  profileInitials: {
-    color: '#FFFFFF', // Couleur du texte
-    fontSize: 24,
-    fontWeight: 'bold',
   },
 });
 

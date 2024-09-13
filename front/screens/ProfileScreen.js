@@ -4,8 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useUser } from '../hooks/UserContext';
 import * as Haptics from "expo-haptics";
 import { API_URL } from '../config';
-
-
+import ProfilePicture from '../components/ProfilePicture';
 
 const ProfileScreen = ({ navigation }) => {
   const { user, logout } = useUser(); // Récupérez la fonction logout
@@ -19,18 +18,6 @@ const ProfileScreen = ({ navigation }) => {
     });
   };
 
-    // Fonction pour obtenir les initiales
-  const getInitials = (username) => {
-    if (!username) return ''; // Si le nom d'utilisateur est vide
-    const nameParts = username.split(' ');
-    if (nameParts.length === 1) {
-      return nameParts[0][0].toUpperCase(); // Si une seule partie, retourne la première lettre
-    }
-    return (
-      nameParts[0][0].toUpperCase() + nameParts[1][0].toUpperCase() // Retourne les deux premières lettres des noms
-    );
-  };
-
   return (
     <View style={styles.container}>      
       <View style={styles.header}>
@@ -39,33 +26,21 @@ const ProfileScreen = ({ navigation }) => {
           onPress={() => {
             Haptics.selectionAsync();
             navigation.goBack();
-          }}
-        >
+          }}>
           <MaterialIcons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
         <Text style={styles.title}>Profile</Text>
       </View>
-
-
       <View style={styles.profileContainer}>
-        { user.data?.profileImageUrl? (
-          <Image
-            source={{ uri: API_URL +  user.data?.profileImageUrl }}
-            style={styles.profileImage}
+          <ProfilePicture 
+            profileImageUrl={user.data?.profileImageUrl} 
+            username={user.data?.username} 
+            size={100} 
           />
-        ) : (
-          // Si aucune image de profil n'est disponible, créer une vue avec les initiales
-          <View style={styles.profilePlaceholder}>
-            <Text style={styles.profileInitials}>
-              {getInitials( user.data?.username)}
-            </Text>
-          </View>
-        )}
-        <Text style={styles.username}>{user.data?.username}</Text>
-        <Text style={styles.location}>{user.data?.location}</Text>
-        <Text style={styles.bio}>{user.data?.bio}</Text>
+          <Text style={styles.username}>{user.data?.username}</Text>
+          <Text style={styles.location}>{user.data?.location}</Text>
+          <Text style={styles.bio}>{user.data?.bio}</Text>
       </View>
-      {/* Ajoutez le bouton de déconnexion */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
@@ -83,25 +58,6 @@ const styles = StyleSheet.create({
   profileContainer: {
     alignItems: 'center',
     marginBottom: 30,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50, // Pour arrondir l'image
-  },
-  profilePlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#FF5733', // Couleur de fond par défaut
-    alignItems: 'center',
-    justifyContent: 'center',
-
-  },
-  profileInitials: {
-    color: '#FFFFFF', // Couleur du texte
-    fontSize: 24,
-    fontWeight: 'bold',
   },
   username: {
     fontSize: 24,

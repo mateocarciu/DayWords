@@ -63,7 +63,7 @@ const AddFriendScreen = ({ navigation }) => {
           <Text style={styles.title}>Add a friend</Text>
       </View>
       <TextInput
-        placeholder="Friend's Email"
+        placeholder="Search by username"
         value={friendUsername}
         onChangeText={setfriendUsername}
         style={styles.input}

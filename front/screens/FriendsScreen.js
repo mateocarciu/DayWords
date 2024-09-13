@@ -5,18 +5,7 @@ import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { useUser } from '../hooks/UserContext';
 import { API_URL } from '../config';
 import * as Haptics from "expo-haptics";
-
-// Fonction pour obtenir les initiales
-const getInitials = (username) => {
-  if (!username) return ''; // Si le nom d'utilisateur est vide
-  const nameParts = username.split(' ');
-  if (nameParts.length === 1) {
-    return nameParts[0][0].toUpperCase(); // Si une seule partie, retourne la première lettre
-  }
-  return (
-    nameParts[0][0].toUpperCase() + nameParts[1][0].toUpperCase() // Retourne les deux premières lettres des noms
-  );
-};
+import ProfilePicture from '../components/ProfilePicture';
 
 const FriendsList = ({ friends, navigation }) => (
   <FlatList
@@ -24,19 +13,12 @@ const FriendsList = ({ friends, navigation }) => (
     keyExtractor={(item) => item.id.toString()}
     renderItem={({ item }) => (
       <View style={styles.friendContainer}>
-        { item.profileImageUrl ? (
-          <Image
-            source={{ uri: API_URL +  item.profileImageUrl }}
-            style={styles.profileImage}
-          />
-        ) : (
-          // Si aucune image de profil n'est disponible, créer une vue avec les initiales
-          <View style={styles.profilePlaceholder}>
-            <Text style={styles.profileInitials}>
-              {getInitials( item.username)}
-            </Text>
-          </View>
-        )}
+        <ProfilePicture 
+          profileImageUrl={item.profileImageUrl} 
+          username={item.username} 
+          size={50}
+          hasMarginRight
+        />
         <View style={styles.friendInfo}>
           <Text style={styles.friendName}>{item.username}</Text>
         </View>
@@ -58,19 +40,12 @@ const FriendRequestsList = ({ friendRequests, handleRequest }) => (
     keyExtractor={(item) => item.id.toString()}
     renderItem={({ item }) => (
       <View style={styles.friendContainer}>
-        { item.sender.profileImageUrl ? (
-          <Image
-            source={{ uri: API_URL +  item.sender.profileImageUrl }}
-            style={styles.profileImage}
-          />
-        ) : (
-          // Si aucune image de profil n'est disponible, créer une vue avec les initiales
-          <View style={styles.profilePlaceholder}>
-            <Text style={styles.profileInitials}>
-              {getInitials( item.sender.username)}
-            </Text>
-          </View>
-        )}
+        <ProfilePicture 
+          profileImageUrl={item.sender.profileImageUrl} 
+          username={item.sender.username} 
+          size={50}
+          hasMarginRight
+        />
         <View style={styles.friendInfo}>
           <Text style={styles.friendName}>{item.sender.username}</Text>
         </View>
@@ -318,27 +293,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Pour arrondir l'image
-    marginRight: 10,
-  },
-  profilePlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#FF5733', // Couleur de fond par défaut
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-
-  },
-  profileInitials: {
-    color: '#FFFFFF', // Couleur du texte
-    fontSize: 24,
-    fontWeight: 'bold',
   },
 });
 

@@ -4,6 +4,7 @@ import { API_URL } from '../config';
 import { useUser } from '../hooks/UserContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Haptics from "expo-haptics";
+import ProfilePicture from '../components/ProfilePicture';
 
 const UserProfileScreen = ({ route, navigation }) => {
   const { userId } = route.params;
@@ -38,29 +39,29 @@ const UserProfileScreen = ({ route, navigation }) => {
       </View>
     );
   }
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
-              <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => {
-            Haptics.selectionAsync();
-            navigation.goBack();
-          }}
-        >
-          <MaterialIcons name="arrow-back" size={28} color="#000000" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.profileHeader}>
-        <Image
-          source={{ uri: `${API_URL}${friendData.profileImageUrl}` }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.username}>{friendData.username}</Text>
-        <Text style={styles.name}>{friendData.name}</Text>
-        <Text style={styles.bio}>{friendData.bio}</Text>
-        {friendData.location && <Text style={styles.infoText}>Location: {friendData.location}</Text>}
+      <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => {
+              Haptics.selectionAsync();
+              navigation.goBack();
+            }}
+          >
+            <MaterialIcons name="arrow-back" size={28} color="#000000" />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.profileHeader}>
+          <ProfilePicture 
+            profileImageUrl={friendData.profileImageUrl} 
+            username={friendData.username} 
+            size={100} 
+          />
+          <Text style={styles.username}>{friendData.username}</Text>
+          <Text style={styles.name}>{friendData.name}</Text>
+          <Text style={styles.bio}>{friendData.bio}</Text>
+          {friendData.location && <Text style={styles.infoText}>Location: {friendData.location}</Text>}
       </View>
     </ScrollView>
   );
@@ -76,12 +77,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     top: 80,
-  },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 10,
   },
   username: {
     fontSize: 24,

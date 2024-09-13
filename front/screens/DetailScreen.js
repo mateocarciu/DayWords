@@ -4,6 +4,7 @@ import { useUser } from '../hooks/UserContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { API_URL } from '../config';
 import * as Haptics from "expo-haptics";
+import ProfilePicture from '../components/ProfilePicture';
 
 const DetailScreen = ({ route, navigation }) => {
   const { entryId } = route.params; // Récupérez l'ID de l'entrée
@@ -99,18 +100,6 @@ const DetailScreen = ({ route, navigation }) => {
     navigation.navigate('UserProfile', { userId }); // Redirection vers la page UserProfileScreen avec l'ID de l'utilisateur
   };
 
-  // Fonction pour obtenir les initiales
-  const getInitials = (username) => {
-    if (!username) return ''; // Si le nom d'utilisateur est vide
-    const nameParts = username.split(' ');
-    if (nameParts.length === 1) {
-      return nameParts[0][0].toUpperCase(); // Si une seule partie, retourne la première lettre
-    }
-    return (
-      nameParts[0][0].toUpperCase() + nameParts[1][0].toUpperCase() // Retourne les deux premières lettres des noms
-    );
-  };
-    
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -134,19 +123,12 @@ const DetailScreen = ({ route, navigation }) => {
             <View>
               <View style={styles.entry}>
               <TouchableOpacity onPress={() => navigateToUserProfile(entry.user.id)}>
-                { entry.user?.profileImageUrl ? (
-                  <Image
-                    source={{ uri: API_URL +  entry.user?.profileImageUrl }}
-                    style={styles.profileImage}
-                  />
-                ) : (
-                  // Si aucune image de profil n'est disponible, créer une vue avec les initiales
-                  <View style={styles.profilePlaceholder}>
-                    <Text style={styles.profileInitials}>
-                      {getInitials( entry.user.username)}
-                    </Text>
-                  </View>
-                )}
+                <ProfilePicture 
+                  profileImageUrl={entry.user.profileImageUrl} 
+                  username={entry.user.username} 
+                  size={50}
+                  hasMarginRight
+                />
                 </TouchableOpacity>
                 <View style={styles.entryContent}>
                   <Text style={styles.entryText}>{entry.text}</Text>
@@ -178,20 +160,12 @@ const DetailScreen = ({ route, navigation }) => {
                     source={{ uri: API_URL + item.user.profileImageUrl }}
                     style={styles.userAvatar}
                   />
-
-                { item.user?.profileImageUrl ? (
-                    <Image
-                      source={{ uri: API_URL + item.user?.profileImageUrl }}
-                      style={styles.profileImage}
-                    />
-                  ) : (
-                    // Si aucune image de profil n'est disponible, créer une vue avec les initiales
-                    <View style={styles.profilePlaceholder}>
-                      <Text style={styles.profileInitials}>
-                        {getInitials( item.user.username)}
-                      </Text>
-                    </View>
-                )}
+                  <ProfilePicture 
+                    profileImageUrl={item.user?.profileImageUrl} 
+                    username={item.user?.username} 
+                    size={50}
+                    hasMarginRight
+                  />
                 </TouchableOpacity>
                 <View style={styles.commentTextContainer}>
                   <Text style={styles.commentUsername}>{item.user.username}</Text>
@@ -273,27 +247,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 0,
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Pour arrondir l'image
-    marginRight: 10,
-  },
-  profilePlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#FF5733', // Couleur de fond par défaut
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-
-  },
-  profileInitials: {
-    color: '#FFFFFF', // Couleur du texte
-    fontSize: 24,
-    fontWeight: 'bold',
   },
   entryContent: {
     flex: 1,
