@@ -12,8 +12,8 @@ import {
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "../hooks/UserContext";
 import * as Haptics from "expo-haptics";
-import { API_URL } from '../config';
-import ProfilePicture from '../components/ProfilePicture';
+import { API_URL } from "../config";
+import ProfilePicture from "../components/ProfilePicture";
 
 const HomeScreen = ({ navigation }) => {
   const { user } = useUser();
@@ -34,14 +34,13 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [user.token]);
 
-
   // Fetch user entries
   const fetchUserEntries = async () => {
     try {
       const response = await fetch(`${API_URL}/api/entries`, {
-        headers: { 
-          Accept: 'application/json',
-          Authorization: `Bearer ${user.token}`  
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${user.token}`,
         },
       });
       const userEntries = await response.json();
@@ -56,8 +55,10 @@ const HomeScreen = ({ navigation }) => {
   const fetchFriendsEntries = async () => {
     try {
       const response = await fetch(`${API_URL}/api/friends-entries`, {
-        headers: { Accept: 'application/json',
-          Authorization: `Bearer ${user.token}`  },
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
       });
       const friendsEntries = await response.json();
       setFriendsEntries(friendsEntries);
@@ -112,13 +113,12 @@ const HomeScreen = ({ navigation }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: 'application/json',
-          Authorization: `Bearer ${user.token}` ,
+          Accept: "application/json",
+          Authorization: `Bearer ${user.token}`,
         },
         body: JSON.stringify(entryData),
       });
       return await response.json();
-      
     } catch (error) {
       console.error("Error saving entry:", error);
       Alert.alert("Error", "Could not save entry.");
@@ -133,7 +133,7 @@ const HomeScreen = ({ navigation }) => {
 
   const navigateToUserProfile = (userId) => {
     Haptics.selectionAsync();
-    navigation.navigate('UserProfile', { userId }); // Redirection vers la page UserProfileScreen avec l'ID de l'utilisateur
+    navigation.navigate("UserProfile", { userId }); // Redirection vers la page UserProfileScreen avec l'ID de l'utilisateur
   };
 
   const getTimeAgo = (date) => {
@@ -144,9 +144,11 @@ const HomeScreen = ({ navigation }) => {
     if (diffInSeconds < 60) {
       return `${diffInSeconds} seconds ago`;
     } else if (diffInMinutes < 60) {
-      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
     } else {
-      return `${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`;
+      return `${date.getHours()}:${
+        date.getMinutes() < 10 ? "0" : ""
+      }${date.getMinutes()}`;
     }
   };
 
@@ -160,10 +162,10 @@ const HomeScreen = ({ navigation }) => {
             navigation.navigate("Profile");
           }}
         >
-          <ProfilePicture 
-            profileImageUrl={user.data?.profileImageUrl} 
-            username={user.data?.username} 
-            size={50} 
+          <ProfilePicture
+            profileImageUrl={user.data?.profileImageUrl}
+            username={user.data?.username}
+            size={50}
           />
         </TouchableOpacity>
         <Text style={styles.title}>DayWords</Text>
@@ -190,7 +192,8 @@ const HomeScreen = ({ navigation }) => {
                 <TouchableOpacity
                   key={entry.id}
                   style={styles.threadContainer}
-                  onPress={() => navigateToDetail(entry.id)}>
+                  onPress={() => navigateToDetail(entry.id)}
+                >
                   <View style={styles.entry}>
                     <Text style={styles.entryText}>{entry.text}</Text>
                     <FontAwesome
@@ -205,7 +208,9 @@ const HomeScreen = ({ navigation }) => {
                       <View key={child.id} style={styles.childContainer}>
                         <View style={styles.threadLine} />
                         <View style={styles.childEntry}>
-                          <Text style={styles.childEntryText}>{child.text}</Text>
+                          <Text style={styles.childEntryText}>
+                            {child.text}
+                          </Text>
                         </View>
                       </View>
                     ))}
@@ -275,12 +280,15 @@ const HomeScreen = ({ navigation }) => {
             <TouchableOpacity
               key={entry.id}
               style={styles.threadContainer}
-              onPress={() => navigateToDetail(entry.id)}>
+              onPress={() => navigateToDetail(entry.id)}
+            >
               <View style={styles.friendEntry}>
-                <TouchableOpacity onPress={() => navigateToUserProfile(entry.user.id)}>
-                  <ProfilePicture 
-                    profileImageUrl={entry.user.profileImageUrl} 
-                    username={entry.user.username} 
+                <TouchableOpacity
+                  onPress={() => navigateToUserProfile(entry.user.id)}
+                >
+                  <ProfilePicture
+                    profileImageUrl={entry.user.profileImageUrl}
+                    username={entry.user.username}
                     size={50}
                     hasMarginRight
                   />
@@ -302,7 +310,8 @@ const HomeScreen = ({ navigation }) => {
                     <Text style={styles.childEntryText}>{child.text}</Text>
                     <Text style={styles.childEntryMeta}>
                       <Text style={styles.friendTime}>
-                        {getTimeAgo(new Date(child.created_at))} {child.location}
+                        {getTimeAgo(new Date(child.created_at))}{" "}
+                        {child.location}
                       </Text>
                     </Text>
                   </View>
@@ -433,7 +442,7 @@ const styles = StyleSheet.create({
     // shadowRadius: 8,
     elevation: 5,
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   entryText: {
     fontSize: 16,

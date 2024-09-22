@@ -12,8 +12,6 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-
-        
         // Validation des champs du formulaire
         $request->validate([
             'username' => 'required|string|max:255|unique:users',
@@ -22,9 +20,9 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'profileImage' => 'nullable|string', // Si vous recevez l'image en tant que chaîne Base64
         ]);
-    
+
         $profileImageUrl = null; // Initialisation de l'URL de l'image
-        
+
         // Si l'image est présente dans la requête
         if ($request->profileImage != 'null') {
             // Extraire le type mime et les données encodées en base64
@@ -33,10 +31,10 @@ class AuthController extends Controller
                 $imageTypeAux = explode('image/', $imageParts[0]);
                 $imageType = $imageTypeAux[1];
                 $imageBase64 = base64_decode($imageParts[1]);
-    
+
                 // Créer un nom unique pour l'image
                 $imageName = time() . '.' . $imageType;
-    
+
                 // Changer le répertoire de stockage vers 'public/profile_images'
                 $filePath = 'public/profile_images/' . $imageName;
 
@@ -61,7 +59,7 @@ class AuthController extends Controller
             'profileImageUrl' => $profileImageUrl,
 
         ]);
-    
+
         return response()->json(['message' => 'User registered successfully!'], 201);
     }
 
@@ -71,21 +69,17 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-    
+
         $user = User::where('email', $request->email)->first();
-    
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
-    
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        // if ($user->profileImageUrl == null) {
-        //     $user->profileImageUrl =  '/storage/profile_images/fakeuser.png';
-        // }
-    
         // Retourner le token ainsi que les informations de l'utilisateur
         return response()->json([
             'access_token' => $token,

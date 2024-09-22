@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { useUser } from '../hooks/UserContext';
-import { MaterialIcons } from '@expo/vector-icons';
-import { API_URL } from '../config';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from "react-native";
+import { useUser } from "../hooks/UserContext";
+import { MaterialIcons } from "@expo/vector-icons";
+import { API_URL } from "../config";
 import * as Haptics from "expo-haptics";
-import ProfilePicture from '../components/ProfilePicture';
+import ProfilePicture from "../components/ProfilePicture";
 
 const DetailScreen = ({ route, navigation }) => {
   const { entryId } = route.params; // Récupérez l'ID de l'entrée
   const { user } = useUser();
   const [entry, setEntry] = useState(null); // Stocker les détails de l'entrée
-  const [commentText, setCommentText] = useState('');
+  const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
@@ -23,8 +34,10 @@ const DetailScreen = ({ route, navigation }) => {
   const fetchEntryDetails = async () => {
     try {
       const response = await fetch(`${API_URL}/api/entries/${entryId}`, {
-        headers: { Accept: 'application/json',
-          Authorization: `Bearer ${user.token}`  },
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
       });
       const data = await response.json();
       setEntry(data);
@@ -37,8 +50,10 @@ const DetailScreen = ({ route, navigation }) => {
   const fetchComments = async () => {
     try {
       const response = await fetch(`${API_URL}/api/comments/${entryId}`, {
-        headers: { Accept: 'application/json',
-          Authorization: `Bearer ${user.token}`  },
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
       });
       const data = await response.json();
       setComments(data);
@@ -49,18 +64,18 @@ const DetailScreen = ({ route, navigation }) => {
   };
 
   const postComment = async () => {
-    if (commentText.trim() === '') {
+    if (commentText.trim() === "") {
       Alert.alert("Error", "Please enter a comment.");
       return;
     }
 
     try {
       const response = await fetch(`${API_URL}/api/comments/${entryId}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Authorization: `Bearer ${user.token}` ,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${user.token}`,
         },
         body: JSON.stringify({ text: commentText }),
       });
@@ -70,8 +85,7 @@ const DetailScreen = ({ route, navigation }) => {
       }
 
       fetchComments(); // Re-fetch comments
-      setCommentText(''); // Clear the input field
-
+      setCommentText(""); // Clear the input field
     } catch (error) {
       console.error("Error posting comment:", error);
       Alert.alert("Error", "Could not post comment.");
@@ -86,35 +100,43 @@ const DetailScreen = ({ route, navigation }) => {
     if (diffInSeconds < 60) {
       return `${diffInSeconds} seconds ago`;
     } else if (diffInMinutes < 60) {
-      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
     } else {
-      return `${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`;
+      return `${date.getHours()}:${
+        date.getMinutes() < 10 ? "0" : ""
+      }${date.getMinutes()}`;
     }
   };
   const navigateToUserProfile = (userId) => {
     Haptics.selectionAsync();
     if (userId === user.data.id) {
-      navigation.navigate('Profile'); // Redirection vers la page ProfileScreen
+      navigation.navigate("Profile"); // Redirection vers la page ProfileScreen
       return;
     }
-    navigation.navigate('UserProfile', { userId }); // Redirection vers la page UserProfileScreen avec l'ID de l'utilisateur
+    navigation.navigate("UserProfile", { userId }); // Redirection vers la page UserProfileScreen avec l'ID de l'utilisateur
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => {
             Haptics.selectionAsync();
             navigation.goBack();
-          }}>
+          }}
+        >
           <MaterialIcons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
         <Text style={styles.title}>
-          {entry && entry.user ? (entry.user.id === user.data.id ? "Your Words" : `${entry.user.username}'s Words`) : "Loading..."}
+          {entry && entry.user
+            ? entry.user.id === user.data.id
+              ? "Your Words"
+              : `${entry.user.username}'s Words`
+            : "Loading..."}
         </Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -122,13 +144,15 @@ const DetailScreen = ({ route, navigation }) => {
           <>
             <View>
               <View style={styles.entry}>
-              <TouchableOpacity onPress={() => navigateToUserProfile(entry.user.id)}>
-                <ProfilePicture 
-                  profileImageUrl={entry.user.profileImageUrl} 
-                  username={entry.user.username} 
-                  size={50}
-                  hasMarginRight
-                />
+                <TouchableOpacity
+                  onPress={() => navigateToUserProfile(entry.user.id)}
+                >
+                  <ProfilePicture
+                    profileImageUrl={entry.user.profileImageUrl}
+                    username={entry.user.username}
+                    size={50}
+                    hasMarginRight
+                  />
                 </TouchableOpacity>
                 <View style={styles.entryContent}>
                   <Text style={styles.entryText}>{entry.text}</Text>
@@ -144,32 +168,41 @@ const DetailScreen = ({ route, navigation }) => {
                     <View style={styles.entryContent}>
                       <Text style={styles.entryText}>{child_entry.text}</Text>
                       <Text style={styles.entryMeta}>
-                        {getTimeAgo(new Date(child_entry.created_at))} {entry?.location}
+                        {getTimeAgo(new Date(child_entry.created_at))}{" "}
+                        {entry?.location}
                       </Text>
                     </View>
                   </View>
-                  {index !== entry.child_entries.length - 1 && <View style={styles.connector} />}
+                  {index !== entry.child_entries.length - 1 && (
+                    <View style={styles.connector} />
+                  )}
                 </View>
               ))}
             </View>
             <Text style={styles.commentsTitle}>Comments</Text>
             {comments.map((item) => (
               <View key={item.id} style={styles.comment}>
-                <TouchableOpacity onPress={() => navigateToUserProfile(item.user.id)}>
+                <TouchableOpacity
+                  onPress={() => navigateToUserProfile(item.user.id)}
+                >
                   <Image
                     source={{ uri: API_URL + item.user.profileImageUrl }}
                     style={styles.userAvatar}
                   />
-                  <ProfilePicture 
-                    profileImageUrl={item.user?.profileImageUrl} 
-                    username={item.user?.username} 
+                  <ProfilePicture
+                    profileImageUrl={item.user?.profileImageUrl}
+                    username={item.user?.username}
                     size={50}
                     hasMarginRight
                   />
                 </TouchableOpacity>
                 <View style={styles.commentTextContainer}>
-                  <Text style={styles.commentUsername}>{item.user.username}</Text>
-                  <Text style={styles.commentTime}>{getTimeAgo(new Date(item.created_at))}</Text>
+                  <Text style={styles.commentUsername}>
+                    {item.user.username}
+                  </Text>
+                  <Text style={styles.commentTime}>
+                    {getTimeAgo(new Date(item.created_at))}
+                  </Text>
                   <Text style={styles.commentText}>{item.text}</Text>
                 </View>
               </View>
@@ -187,12 +220,8 @@ const DetailScreen = ({ route, navigation }) => {
           onChangeText={setCommentText}
           style={styles.commentInput}
         />
-        <TouchableOpacity
-          style={styles.addCommentButton}
-          onPress={postComment}
-        >
+        <TouchableOpacity style={styles.addCommentButton} onPress={postComment}>
           <MaterialIcons name="send" size={22} color="#fff" />
-
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -202,50 +231,50 @@ const DetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   scrollContent: {
     paddingTop: 120, // Ajustez ceci en fonction de la hauteur du header
     padding: 20,
   },
   header: {
-    position: 'absolute',
+    position: "absolute",
     top: 30,
     left: 0,
     right: 0,
     height: 80,
     paddingHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     zIndex: 1,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 4,
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     left: 20,
     top: 25,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   entry: {
     padding: 20,
     borderRadius: 10,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
+    backgroundColor: "#fff",
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
     elevation: 5,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 0,
   },
   entryContent: {
@@ -253,24 +282,24 @@ const styles = StyleSheet.create({
   },
   entryText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginBottom: 10,
   },
   entryMeta: {
     fontSize: 12,
-    color: '#888',
+    color: "#888",
   },
   commentsTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 25,
     marginBottom: 10,
   },
   comment: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     marginVertical: 5,
   },
@@ -285,54 +314,54 @@ const styles = StyleSheet.create({
   },
   commentUsername: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   commentTime: {
     fontSize: 12,
-    color: '#888',
+    color: "#888",
   },
   commentText: {
     fontSize: 14,
-    color: '#333',
+    color: "#333",
     marginTop: 5,
   },
   addCommentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 10,
     borderTopWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: "#ddd",
+    backgroundColor: "#fff",
     paddingBottom: 20,
   },
   commentInput: {
     flex: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginRight: 10,
   },
   addCommentButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: "#6200ee",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
   },
   addCommentButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   connector: {
     height: 10,
     borderLeftWidth: 2,
-    borderColor: '#6200ee',
+    borderColor: "#6200ee",
     marginLeft: 36,
   },
   loadingText: {
-    textAlign: 'center',
-    color: '#888',
+    textAlign: "center",
+    color: "#888",
     marginTop: 20,
   },
 });

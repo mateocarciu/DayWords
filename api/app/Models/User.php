@@ -14,12 +14,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasApiTokens;
 
     protected $fillable = [
-        'username', 
-        'name', 
-        'bio', 
-        'email', 
-        'password', 
-        'profileImageUrl', 
+        'username',
+        'name',
+        'bio',
+        'email',
+        'password',
+        'profileImageUrl',
         'location',
     ];
 
@@ -37,9 +37,9 @@ class User extends Authenticatable
     {
         // Les amis où l'utilisateur est dans la colonne `user_id`
         return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
-    
+
     // public function inverseFriends(): BelongsToMany
     // {
     //     // Les amis où l'utilisateur est dans la colonne `friend_id`
@@ -51,9 +51,9 @@ class User extends Authenticatable
 
 
     public function allFriends()
-{
-    return $this->friends()->get();
-}
+    {
+        return $this->friends()->get();
+    }
 
     public function sentFriendRequests(): HasMany
     {

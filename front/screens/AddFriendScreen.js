@@ -1,29 +1,57 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
 import { useUser } from '../hooks/UserContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { API_URL } from '../config';
 import * as Haptics from "expo-haptics";
+import ProfilePicture from '../components/ProfilePicture';
 
 const AddFriendScreen = ({ navigation }) => {
   const { user } = useUser();
-  const [friendUsername, setfriendUsername] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
-  const handleAddFriend = async () => {
-    if (friendUsername.trim() === '') {
-      Alert.alert('Erreur', 'Please enter a valid username.');
-      return;
+  // Fonction pour chercher des utilisateurs en fonction du username
+  const searchUsers = async (username) => {
+    try {
+      const response = await fetch(`${API_URL}/api/friends/search?searchTerm=${encodeURIComponent(username)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to search users');
+      }
+  
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (error) {
+      console.error('Error searching users:', error);
     }
+  };  
 
+  // Déclenche la recherche chaque fois que le terme de recherche change
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      searchUsers(searchTerm);
+    } else {
+      setSearchResults([]); // Effacer les résultats si le champ est vide
+    }
+  }, [searchTerm]);  
+
+  // Fonction pour ajouter un ami
+  const handleAddFriend = async (username) => {
     try {
       const response = await fetch(`${API_URL}/api/friends/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Accept: 'application/json',
           Authorization: `Bearer ${user.token}`,
         },
-        body: JSON.stringify({ username: friendUsername }),
+        body: JSON.stringify({ username }),
       });
 
       if (!response.ok) {
@@ -32,51 +60,61 @@ const AddFriendScreen = ({ navigation }) => {
         } else if (response.status === 409) {
           Alert.alert('Erreur', 'Friend request already exists.');
         } else {
-          throw new Error("Failed to send friend request");
+          throw new Error('Failed to send friend request');
         }
         return;
       }
 
-      const data = await response.json();
       Alert.alert('Succès', 'Friend request sent.');
-      setfriendUsername(''); // Clear the input field
-      navigation.goBack();
-
     } catch (error) {
-      console.error("Error adding friend:", error);
-      Alert.alert("Erreur", "Could not send friend request.");
+      console.error('Error adding friend:', error);
+      Alert.alert('Erreur', 'Could not send friend request.');
     }
   };
+
+  const renderItem = ({ item }) => (
+    <View style={styles.resultItem}>
+      <Text style={styles.resultText}>{item.username}</Text>
+      {item.isFriend ? (
+        <Text style={styles.alreadyFriend}>Already Friends</Text>
+      ) : (
+        <TouchableOpacity style={styles.addButton} onPress={() => handleAddFriend(item.username)}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => {
-              Haptics.selectionAsync();
-              navigation.goBack();
-            }}
-          >
-            <MaterialIcons name="arrow-back" size={28} color="#000000" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Add a friend</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => {
+            Haptics.selectionAsync();
+            navigation.goBack();
+          }}
+        >
+          <MaterialIcons name="arrow-back" size={28} color="#000000" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Add a friend</Text>
       </View>
+
       <TextInput
         placeholder="Search by username"
-        value={friendUsername}
-        onChangeText={setfriendUsername}
+        value={searchTerm}
+        onChangeText={setSearchTerm}
         style={styles.input}
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <TouchableOpacity
-        style={[styles.button, friendUsername.trim() === '' && styles.buttonDisabled]}
-        onPress={handleAddFriend}
-        disabled={friendUsername.trim() === ''}
-      >
-        <Text style={styles.buttonText}>Add</Text>
-      </TouchableOpacity>
+
+      <FlatList
+        data={searchResults}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+        style={styles.resultsList}
+      />
     </View>
   );
 };
@@ -84,8 +122,6 @@ const AddFriendScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
   input: {
@@ -99,28 +135,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  button: {
-    backgroundColor: '#6200ee',
-    padding: 15,
-    borderRadius: 10,
-    justifyContent: 'center',
+  resultsList: {
+    marginTop: 20,
+  },
+  resultItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
-    width: '100%',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
-  buttonDisabled: {
-    backgroundColor: '#aaa',
-  },
-  buttonText: {
-    color: '#fff',
+  resultText: {
     fontSize: 16,
-    fontWeight: 'bold',
+  },
+  alreadyFriend: {
+    color: 'green',
+    fontSize: 14,
+  },
+  addButton: {
+    backgroundColor: '#6200ee',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 14,
   },
   header: {
-    position: 'absolute',
-    top: 30,
-    left: 0,
-    right: 0,
     height: 80,
     paddingHorizontal: 20,
     flexDirection: 'row',
