@@ -24,7 +24,9 @@ class FriendController extends Controller
         if ($friend) {
             return response()->json($friend);
         } else {
-            return response()->json('Friend not found', 404);
+            $friend = User::find($id);
+            return response()->json($friend);
+
         }
     }
 
@@ -150,6 +152,7 @@ class FriendController extends Controller
 
                 return [
                     'id' => $searchedUser->id,
+                    'profileImageUrl' => $searchedUser->profileImageUrl,
                     'username' => $searchedUser->username,
                     'isFriend' => $isFriend,
                 ];

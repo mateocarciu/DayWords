@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
+  TextInput,
 } from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
@@ -19,6 +20,8 @@ const FriendsScreen = ({ navigation }) => {
   const { user } = useUser();
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: "friends", title: "Friends" },
@@ -31,6 +34,21 @@ const FriendsScreen = ({ navigation }) => {
       fetchFriendRequests();
     }
   }, [user.token]);
+
+  useEffect(() => {
+    if (user.token) {
+      fetchUserFriends();
+      fetchFriendRequests();
+    }
+  }, [user.token]);
+
+  useEffect(() => {
+    if (searchTerm) {
+      searchUsers(searchTerm);
+    } else {
+      setSearchResults([]); // Clear search results when input is empty
+    }
+  }, [searchTerm]);
 
   const confirmDeleteFriend = (friendId) => {
     Alert.alert(
@@ -52,7 +70,6 @@ const FriendsScreen = ({ navigation }) => {
     );
   };
 
-  // Fonction pour supprimer un ami
   const deleteFriend = async (friendId) => {
     try {
       const response = await fetch(`${API_URL}/api/friends/${friendId}`, {
@@ -67,15 +84,101 @@ const FriendsScreen = ({ navigation }) => {
       if (!response.ok) throw new Error("Failed to delete friend");
 
       fetchUserFriends();
-      Alert.alert("Success", "Friend removed successfully");
     } catch (error) {
       console.error("Error deleting friend:", error);
-      Alert.alert("Error", "Failed to delete friend.");
     }
   };
-  //delete doesnt work
 
-  const FriendsList = ({ friends, navigation }) => (
+  const searchUsers = async (username) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/friends/search?searchTerm=${encodeURIComponent(
+          username
+        )}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to search users");
+      }
+
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (error) {
+      console.error("Error searching users:", error);
+    }
+  };
+
+  // Fonction pour ajouter un ami
+  const handleAddFriend = async (username) => {
+    try {
+      const response = await fetch(`${API_URL}/api/friends/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ username }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          Alert.alert("Erreur", "User not found.");
+        } else if (response.status === 409) {
+          Alert.alert("Erreur", "Friend request already exists.");
+        } else {
+          throw new Error("Failed to send friend request");
+        }
+        return;
+      }
+
+      Alert.alert("Succès", "Friend request sent.");
+    } catch (error) {
+      console.error("Error adding friend:", error);
+      Alert.alert("Erreur", "Could not send friend request.");
+    }
+  };
+
+  const renderSearchResults = () => (
+    <FlatList
+      data={searchResults}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.friendContainer}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("UserProfile", { userId: item.id })
+            }
+          >
+            <ProfilePicture
+              profileImageUrl={item.profileImageUrl}
+              username={item.username}
+              size={50}
+              hasMarginRight
+            />
+          </TouchableOpacity>
+
+          <View style={styles.friendInfo}>
+            <Text style={styles.friendName}>{item.username}</Text>
+          </View>
+          {!item.isFriend && (
+            <TouchableOpacity onPress={() => handleAddFriend(item.username)}>
+              <MaterialIcons name="person-add" size={28} color="#000000" />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+      contentContainerStyle={styles.friendsList}
+    />
+  );
+
+  const FriendsList = () => (
     <FlatList
       data={friends}
       keyExtractor={(item) => item.id.toString()}
@@ -105,7 +208,7 @@ const FriendsScreen = ({ navigation }) => {
     />
   );
 
-  const FriendRequestsList = ({ friendRequests, handleRequest }) => (
+  const FriendRequestsList = () => (
     <FlatList
       data={friendRequests}
       keyExtractor={(item) => item.id.toString()}
@@ -191,8 +294,8 @@ const FriendsScreen = ({ navigation }) => {
           ? "Friend request accepted"
           : "Friend request rejected";
       Alert.alert("Success", message);
-      fetchFriendRequests(); // Refresh the list of friend requests after action
-      fetchUserFriends(); // Refresh the list of friend requests after action
+      fetchFriendRequests();
+      fetchUserFriends();
     } catch (error) {
       console.error("Error handling friend request:", error);
       Alert.alert("Error", "Failed to update friend request.");
@@ -200,13 +303,8 @@ const FriendsScreen = ({ navigation }) => {
   };
 
   const renderScene = SceneMap({
-    friends: () => <FriendsList friends={friends} navigation={navigation} />,
-    requests: () => (
-      <FriendRequestsList
-        friendRequests={friendRequests}
-        handleRequest={handleRequest}
-      />
-    ),
+    friends: () => (searchTerm ? renderSearchResults() : <FriendsList />),
+    requests: () => <FriendRequestsList />,
   });
 
   return (
@@ -223,28 +321,40 @@ const FriendsScreen = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.title}>Friends</Text>
       </View>
-      <View style={styles.tabViewContainer}>
-        <TabView
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
-          onIndexChange={setIndex}
-          initialLayout={{ width: Dimensions.get("window").width }}
-          renderTabBar={(props) => (
-            <TabBar
-              {...props}
-              indicatorStyle={{ backgroundColor: "#6200ee" }}
-              style={{ backgroundColor: "white" }}
-              labelStyle={{ color: "#6200ee", fontWeight: "bold" }}
-            />
-          )}
+      <View style={styles.searchBarContainer}>
+        <MaterialIcons
+          name="search"
+          size={24}
+          color="#aaa"
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search..."
+          value={searchTerm}
+          onChangeText={setSearchTerm}
         />
       </View>
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate("AddFriend")}
-      >
-        <Text style={styles.addButtonText}>Add Friend</Text>
-      </TouchableOpacity>
+      <View style={styles.tabViewContainer}>
+        {searchTerm.length === 0 ? (
+          <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{ width: Dimensions.get("window").width }}
+            renderTabBar={(props) => (
+              <TabBar
+                {...props}
+                indicatorStyle={{ backgroundColor: "#6200ee" }}
+                style={{ backgroundColor: "white" }}
+                labelStyle={{ color: "#6200ee", fontWeight: "bold" }}
+              />
+            )}
+          />
+        ) : (
+          renderSearchResults()
+        )}
+      </View>
     </View>
   );
 };
@@ -315,20 +425,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  addButton: {
-    backgroundColor: "#6200ee",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    alignSelf: "center",
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  addButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
   header: {
     position: "absolute",
     top: 30,
@@ -355,6 +451,27 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#333",
+  },
+  searchBarContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff", // Fond blanc pour le conteneur
+    borderRadius: 20, // Coins arrondis
+    elevation: 4, // Ombre légère
+    paddingHorizontal: 15, // Espacement à l'intérieur
+    marginBottom: 20, // Espace en bas
+    marginHorizontal: 15, // Espace sur les côtés
+  },
+  searchBar: {
+    flex: 1, // Prend tout l'espace disponible
+    height: 45, // Hauteur de la barre
+    borderRadius: 30, // Coins arrondis
+    paddingHorizontal: 10, // Espacement interne
+    color: "#333", // Couleur du texte
+    fontSize: 16, // Taille de police
+  },
+  searchIcon: {
+    marginRight: 10, // Espacement entre l'icône et le champ de texte
   },
 });
 

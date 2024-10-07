@@ -11,8 +11,9 @@ class EntryController extends Controller
 {
     public function index()
     {
+        $today = now()->startOfDay();
         $entries = Auth::user()->entries()
-            ->rootEntries()
+            // ->whereDate('created_at', $today)
             ->with(['comments', 'childEntries'])
             ->get();
 
@@ -85,11 +86,13 @@ class EntryController extends Controller
 
     public function getFriendsEntries(Request $request)
     {
+        $today = now()->startOfDay();
         // Récupérer les entrées des amis, avec les utilisateurs et les enfants
         $friendsEntries = Auth::user()->allFriends()
             ->load([
                 'entries' => function ($query) {
                     $query->whereNull('parent_entry_id')
+                        // ->whereDate('created_at', $today)
                         ->with('user', 'childEntries');
                 }
             ])
