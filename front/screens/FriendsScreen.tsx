@@ -12,7 +12,6 @@ import {
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { useUser } from "../hooks/UserContext";
-import { API_URL } from "../config";
 import * as Haptics from "expo-haptics";
 import ProfilePicture from "../components/ProfilePicture";
 
@@ -72,7 +71,7 @@ const FriendsScreen = ({ navigation }) => {
 
   const deleteFriend = async (friendId) => {
     try {
-      const response = await fetch(`${API_URL}/api/friends/${friendId}`, {
+      const response = await fetch(`${process.env.API_URL}/api/friends/${friendId}`, {
         method: "DELETE",
         headers: {
           Accept: "application/json",
@@ -92,7 +91,7 @@ const FriendsScreen = ({ navigation }) => {
   const searchUsers = async (username) => {
     try {
       const response = await fetch(
-        `${API_URL}/api/friends/search?searchTerm=${encodeURIComponent(
+        `${process.env.API_URL}/api/users/search?searchTerm=${encodeURIComponent(
           username
         )}`,
         {
@@ -118,7 +117,7 @@ const FriendsScreen = ({ navigation }) => {
   // Fonction pour ajouter un ami
   const handleAddFriend = async (username) => {
     try {
-      const response = await fetch(`${API_URL}/api/friends/add`, {
+      const response = await fetch(`${process.env.API_URL}/api/friends/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -245,7 +244,7 @@ const FriendsScreen = ({ navigation }) => {
 
   const fetchUserFriends = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/friends`, {
+      const response = await fetch(`${process.env.API_URL}/api/friends`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${user.token}`,
@@ -262,7 +261,7 @@ const FriendsScreen = ({ navigation }) => {
 
   const fetchFriendRequests = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/friend-requests`, {
+      const response = await fetch(`${process.env.API_URL}/api/friend-requests`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${user.token}`,
@@ -279,7 +278,7 @@ const FriendsScreen = ({ navigation }) => {
 
   const handleRequest = async (id, action) => {
     try {
-      const response = await fetch(`${API_URL}/api/friend-requests/${id}`, {
+      const response = await fetch(`${process.env.API_URL}/api/friend-requests/${id}`, {
         method: "PATCH",
         headers: {
           Accept: "application/json",

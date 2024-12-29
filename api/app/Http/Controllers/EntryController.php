@@ -6,6 +6,7 @@ use App\Models\Entry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Events\NewEntry;
 
 class EntryController extends Controller
 {
@@ -39,6 +40,17 @@ class EntryController extends Controller
             'public' => $request->public,
             'parent_entry_id' => $request->parent_entry_id,
         ]);
+
+        // $receiver = User::find(4);
+        // $sender = User::find(Auth::user()->id);
+        // broadcast(new NewEntry($sender, $sender, $request->text));
+
+        // Récupérer les amis de l'utilisateur
+        // $friends = Auth::user()->friends;
+        // info($friends);
+        // info(Auth::user());
+
+        broadcast(new NewEntry(Auth::user()->friends, Auth::user()));
 
         return response()->json(201);
     }

@@ -15,7 +15,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    Route::get('/friends/search', [FriendController::class, 'searchUsers']);
+    Route::get('/users/search', [FriendController::class, 'searchUsers']);
 
     Route::apiResource('/friends', FriendController::class);
     Route::post('/friends/add', [FriendController::class, 'store']);

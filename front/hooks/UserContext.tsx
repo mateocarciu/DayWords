@@ -1,7 +1,11 @@
 import React, { createContext, useState, useContext, useMemo, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const UserContext = createContext();
+const UserContext = createContext({
+  user: { data: null, token: null },
+  setUser: async (userData: any) => {},
+  logout: async () => {},
+});
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState({
@@ -24,7 +28,7 @@ export const UserProvider = ({ children }) => {
     loadUserData();
   }, []);
 
-  const saveUser = async (userData) => {
+  const saveUser = async (userData: { data: any; token: string | null }) => {
     try {
       await AsyncStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);

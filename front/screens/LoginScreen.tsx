@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
@@ -12,7 +11,6 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "../hooks/UserContext";
-import { API_URL } from "../config";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -42,7 +40,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/login`, {
+      const response = await fetch(`${process.env.API_URL}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

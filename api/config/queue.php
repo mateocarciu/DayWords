@@ -34,6 +34,11 @@ return [
             'driver' => 'sync',
         ],
 
+        'file' => [
+            'driver' => 'file',
+            'path' => storage_path('framework/queues'),  // Dossier pour stocker les files
+        ],
+
         'database' => [
             'driver' => 'database',
             'connection' => env('DB_QUEUE_CONNECTION'),

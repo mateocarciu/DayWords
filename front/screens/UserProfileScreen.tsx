@@ -3,11 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { API_URL } from "../config";
 import { useUser } from "../hooks/UserContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -27,7 +25,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   // Fonction pour récupérer les informations du profil de l'utilisateur
   const fetchFriendData = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/friends/${userId}`, {
+      const response = await fetch(`${process.env.API_URL}/api/friends/${userId}`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${user.token}`,
@@ -98,6 +96,11 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   bio: {
+    fontSize: 14,
+    color: "#888",
+    marginTop: 5,
+  },
+  infoText: {
     fontSize: 14,
     color: "#888",
     marginTop: 5,

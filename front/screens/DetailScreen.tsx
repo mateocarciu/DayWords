@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { useUser } from "../hooks/UserContext";
 import { MaterialIcons } from "@expo/vector-icons";
-import { API_URL } from "../config";
 import * as Haptics from "expo-haptics";
 import ProfilePicture from "../components/ProfilePicture";
 
@@ -33,7 +32,7 @@ const DetailScreen = ({ route, navigation }) => {
 
   const fetchEntryDetails = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/entries/${entryId}`, {
+      const response = await fetch(`${process.env.API_URL}/api/entries/${entryId}`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${user.token}`,
@@ -49,7 +48,7 @@ const DetailScreen = ({ route, navigation }) => {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/comments/${entryId}`, {
+      const response = await fetch(`${process.env.API_URL}/api/comments/${entryId}`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${user.token}`,
@@ -70,7 +69,7 @@ const DetailScreen = ({ route, navigation }) => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/comments/${entryId}`, {
+      const response = await fetch(`${process.env.API_URL}/api/comments/${entryId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -92,9 +91,33 @@ const DetailScreen = ({ route, navigation }) => {
     }
   };
 
-  const getTimeAgo = (date) => {
+  interface Entry {
+    id: string;
+    text: string;
+    created_at: string;
+    location?: string;
+    user: {
+      id: string;
+      username: string;
+      profileImageUrl: string;
+    };
+    child_entries: Entry[];
+  }
+
+  interface Comment {
+    id: string;
+    text: string;
+    created_at: string;
+    user: {
+      id: string;
+      username: string;
+      profileImageUrl: string;
+    };
+  }
+
+  const getTimeAgo = (date: Date): string => {
     const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
     const diffInMinutes = Math.floor(diffInSeconds / 60);
 
     if (diffInSeconds < 60) {
@@ -102,9 +125,7 @@ const DetailScreen = ({ route, navigation }) => {
     } else if (diffInMinutes < 60) {
       return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
     } else {
-      return `${date.getHours()}:${
-        date.getMinutes() < 10 ? "0" : ""
-      }${date.getMinutes()}`;
+      return `${date.getHours()}:${date.getMinutes() < 10 ? "0" : ""}${date.getMinutes()}`;
     }
   };
   const navigateToUserProfile = (userId) => {
@@ -186,8 +207,7 @@ const DetailScreen = ({ route, navigation }) => {
                   onPress={() => navigateToUserProfile(item.user.id)}
                 >
                   <Image
-                    source={{ uri: API_URL + item.user.profileImageUrl }}
-                    style={styles.userAvatar}
+                    source={{ uri: process.env.API_URL + item.user.profileImageUrl }}
                   />
                   <ProfilePicture
                     profileImageUrl={item.user?.profileImageUrl}

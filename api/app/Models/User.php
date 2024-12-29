@@ -40,16 +40,6 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    // public function inverseFriends(): BelongsToMany
-    // {
-    //     // Les amis où l'utilisateur est dans la colonne `friend_id`
-    //     return $this->belongsToMany(User::class, 'friends', 'friend_id', 'user_id')
-    //                 ->withTimestamps();
-    // }
-
-    // return $this->friends()->get()->merge($this->inverseFriends()->get());
-
-
     public function allFriends()
     {
         return $this->friends()->get();

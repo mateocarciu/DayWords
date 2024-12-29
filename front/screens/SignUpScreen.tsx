@@ -12,7 +12,6 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { API_URL } from "../config";
 
 const SignUpScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -43,7 +42,7 @@ const SignUpScreen = ({ navigation }) => {
     // }
 
     try {
-      const response = await fetch(`${API_URL}/api/register`, {
+      const response = await fetch(`${process.env.API_URL}/api/register`, {
         method: "POST",
         headers: {
           Accept: "application/json",

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { API_URL } from '../config';
 
 const ProfilePicture = ({ profileImageUrl, username, size = 100, hasMarginRight = false }) => {
     // Fonction pour obtenir les initiales
@@ -19,7 +18,7 @@ const ProfilePicture = ({ profileImageUrl, username, size = 100, hasMarginRight 
         <View>
             {profileImageUrl ? (
                 <Image
-                    source={{ uri: API_URL + profileImageUrl }}
+                    source={{ uri: process.env.API_URL + profileImageUrl }}
                     style={[
                         styles.profileImage,
                         { width: size, height: size, borderRadius: size / 2, marginRight: hasMarginRight ? 10 : 0 }

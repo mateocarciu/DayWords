@@ -83,7 +83,6 @@ class AuthController extends Controller
         // Retourner le token ainsi que les informations de l'utilisateur
         return response()->json([
             'access_token' => $token,
-            'token_type' => 'Bearer',
             'user' => $user,
         ]);
     }

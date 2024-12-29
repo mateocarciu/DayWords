@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "../hooks/UserContext";
 import * as Haptics from "expo-haptics";
-import { API_URL } from "../config";
 import ProfilePicture from "../components/ProfilePicture";
 
 const ProfileScreen = ({ navigation }) => {
