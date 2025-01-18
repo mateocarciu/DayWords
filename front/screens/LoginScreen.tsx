@@ -81,7 +81,6 @@ const LoginScreen = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Welcome to DayWords</Text>
-        <Text style={styles.title}>Login</Text>
         <TextInput
           placeholder="Email"
           placeholderTextColor="#aaa"

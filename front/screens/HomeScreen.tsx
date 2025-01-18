@@ -26,21 +26,28 @@ const HomeScreen = ({ navigation }) => {
     }, 2000);
   }, [user]);
 
+  // useEffect(() => {
+  //   if (echo && user) {
+  //     const channel = echo.private(`newEntry.${user.data.id}`);
+  //     channel.listen('NewEntry', (event) => {
+  //       Alert.alert(
+  //         'Nouvelle entrée',
+  //         `${event.sender.username} a posté une nouvelle entrée`
+  //       );
+  //       fetchFriendsEntries();
+  //       fetchUserEntries();
+  //     });
+  
+  //     return () => {
+  //       channel.stopListening('NewEntry');
+  //     };
+  //   }
+  // }, [user, echo]);
+
   useEffect(() => {
     if (echo && user) {
-      const channel = echo.private(`newEntry.${user.data.id}`);
-      channel.listen('NewEntry', (event) => {
-        Alert.alert(
-          'Nouvelle entrée',
-          `${event.sender.username} a posté une nouvelle entrée`
-        );
-        fetchFriendsEntries();
-        fetchUserEntries();
-      });
-  
-      return () => {
-        channel.stopListening('NewEntry');
-      };
+      fetchUserEntries();
+      fetchFriendsEntries();
     }
   }, [user, echo]);
 
