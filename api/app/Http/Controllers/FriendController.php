@@ -9,17 +9,22 @@ use Illuminate\Support\Facades\Auth;
 
 class FriendController extends Controller
 {
+    protected $user;
+
+    public function __construct()
+    {
+        $this->user = Auth::user();
+    }
+
     public function index()
     {
-        $user = Auth::user();
-        $friends = $user->allFriends();
+        $friends = $this->user->allFriends();
         return response()->json($friends);
     }
 
     public function show($id)
     {
-        $user = Auth::user();
-        $friend = $user->allFriends()->find($id);
+        $friend = $this->user->allFriends()->find($id);
 
         if ($friend) {
             return response()->json($friend);
@@ -32,10 +37,8 @@ class FriendController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
         $friendUsername = $request->input('username');
 
-        // Vérifier si l'utilisateur existe
         $friend = User::where('username', $friendUsername)->first();
 
         if (!$friend) {
@@ -43,26 +46,25 @@ class FriendController extends Controller
         }
 
         // pour pas pouvoir s'ajouter soit meme
-        if ($user->id == $friend->id) {
+        if ($this->user->id == $friend->id) {
             return response()->json(['message' => 'You cannot be friend with yourself'], 403);
         }
 
         // Vérifier si une demande d'ami existe déjà
         $existingRequest = FriendRequest::where([
-            ['sender_id', '=', $user->id],
+            ['sender_id', '=', $this->user->id],
             ['receiver_id', '=', $friend->id],
         ])->orWhere([
                     ['sender_id', '=', $friend->id],
-                    ['receiver_id', '=', $user->id],
+                    ['receiver_id', '=', $this->user->id],
                 ])->first();
 
         if ($existingRequest) {
             return response()->json(['message' => 'Friend request already exists'], 409);
         }
 
-        // Créer une nouvelle demande d'ami
         $friendRequest = FriendRequest::create([
-            'sender_id' => $user->id,
+            'sender_id' => $this->user->id,
             'receiver_id' => $friend->id,
             'status' => 'PENDING',
             'date' => now(),
@@ -73,12 +75,11 @@ class FriendController extends Controller
 
     public function destroy($id)
     {
-        $user = Auth::user();
-        $friend = $user->allFriends()->find($id);
+        $friend = $this->user->allFriends()->find($id);
 
         if ($friend) {
-            $user->friends()->detach($id);
-            $friend->friends()->detach($user->id);
+            $this->user->friends()->detach($id);
+            $friend->friends()->detach($this->user->id);
 
             return response()->json(['message' => 'Friend removed'], 200);
         } else {
@@ -88,8 +89,7 @@ class FriendController extends Controller
 
     public function friendRequests()
     {
-        $user = Auth::user();
-        $requests = FriendRequest::where('receiver_id', $user->id)
+        $requests = FriendRequest::where('receiver_id', $this->user->id)
             ->where('status', 'PENDING')
             ->with('sender')
             ->get();
@@ -99,30 +99,25 @@ class FriendController extends Controller
     public function handleFriendRequest(Request $request, $id)
     {
         $friendRequest = FriendRequest::findOrFail($id);
-        $user = Auth::user();
 
         // Vérifier si l'utilisateur connecté est le destinataire de la demande
-        if ($user->id !== $friendRequest->receiver_id) {
+        if ($this->user->id !== $friendRequest->receiver_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         if ($request->action === 'accept') {
-            // Ajouter une entrée dans la table `friends`
-            $user->friends()->attach($friendRequest->sender_id);
-            $friendRequest->sender->friends()->attach($user->id);
+            $this->user->friends()->attach($friendRequest->sender_id);
+            $friendRequest->sender->friends()->attach($this->user->id);
 
             $friendRequest->status = 'ACCEPTED';
 
             // Supprimer la demande d'ami après l'acceptation
             $friendRequest->delete();
-            // $friendRequest->save();
 
 
             return response()->json(['message' => 'Friend request accepted'], 200);
         } elseif ($request->action === 'reject') {
             // Supprimer la demande d'ami si elle est rejetée
-            // $friendRequest->delete();
-            // $friendRequest->status = 'REJECTED';
             $friendRequest->delete();
 
             return response()->json(['message' => 'Friend request rejected'], 200);
@@ -135,20 +130,19 @@ class FriendController extends Controller
 
     public function searchUsers(Request $request)
     {
-        $user = Auth::user();
-        $searchTerm = $request->query('searchTerm'); // Utilise query() pour récupérer les paramètres GET
+        $searchTerm = $request->query('searchTerm'); // Utilise query() pour récupérer les paramètres GET de la requête
 
         if (!$searchTerm) {
             return response()->json(['message' => 'Search term is required'], 400);
         }
 
-        // Rechercher les utilisateurs correspondant au terme de recherche
+        // Rechercher les utilisateurs correspondant au terme de recherche qui est envoyé
         $users = User::where('username', 'LIKE', '%' . $searchTerm . '%')
-            ->where('id', '!=', $user->id) // Exclure l'utilisateur connecté
+            ->where('id', '!=', $this->user->id) // Exclure l'utilisateur connecté
             ->get()
-            ->map(function ($searchedUser) use ($user) {
+            ->map(function ($searchedUser) {
                 // Vérifier si l'utilisateur est déjà ami avec l'utilisateur trouvé
-                $isFriend = $user->allFriends()->contains($searchedUser->id);
+                $isFriend = $this->user->allFriends()->contains($searchedUser->id);
 
                 return [
                     'id' => $searchedUser->id,
