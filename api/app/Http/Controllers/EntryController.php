@@ -10,11 +10,19 @@ use App\Events\NewEntry;
 
 class EntryController extends Controller
 {
+    protected $user;
+
+    public function __construct()
+    {
+        $this->user = Auth::user();
+    }
+
     public function index()
     {
-        $entries = Auth::user()->entries()
+        $entries = $this->user->entries()
             // ->whereDate('created_at', now()->startOfDay())
-            ->with(['comments', 'childEntries'])
+            ->with(['childEntries'])
+            ->where('parent_entry_id', null)
             ->get();
 
         return response()->json($entries);
@@ -31,7 +39,7 @@ class EntryController extends Controller
             'parent_entry_id' => 'nullable|exists:entries,id',
         ]);
 
-        Auth::user()->entries()->create([
+        $this->user->entries()->create([
             'text' => $request->text,
             'location' => $request->location,
             'emotion' => $request->emotion,
@@ -49,23 +57,27 @@ class EntryController extends Controller
         // info($friends);
         // info(Auth::user());
 
-        broadcast(new NewEntry(Auth::user()->friends, Auth::user()));
+        // broadcast(new NewEntry(Auth::user()->friends, Auth::user()));
+        broadcast(new NewEntry($this->user->friends, $this->user));
+
 
         return response()->json(201);
     }
 
-    // Montre une entrée spécifique
     public function show($id)
     {
-        $entry = Entry::with(['comments', 'childEntries', 'user'])->findOrFail($id);  // Chargement des sous-entrées
+        $entry = Entry::with(['user', 'childEntries', 'comments.user'])
+            ->where(function ($query) {
+                $query->where('user_id', $this->user->id)
+                    ->orWhereIn('user_id', $this->user->friends->pluck('id'));
+            })
+            ->findOrFail($id);
+
         return response()->json($entry);
     }
 
-    // Mise à jour d'une entrée
     public function update(Request $request, $id)
     {
-        $entry = Entry::findOrFail($id);
-
         $request->validate([
             'text' => 'sometimes|required|string',
             'time' => 'sometimes|required',
@@ -76,6 +88,8 @@ class EntryController extends Controller
             'public' => 'sometimes|required|boolean',
         ]);
 
+        $entry = Entry::findOrFail($id);
+
         $entry->update($request->all());
 
         return response()->json($entry);
@@ -83,22 +97,20 @@ class EntryController extends Controller
 
     public function destroy($id)
     {
-        $entry = Entry::findOrFail($id);
+        $entry = Entry::findOrFail($id)->where('user_id', $this->user->id);
 
         $entry->delete();
 
         return response()->json(null, 204);
     }
 
-    public function getFriendsEntries(Request $request)
+    public function getFriendsEntries()
     {
-        $today = now()->startOfDay();
-        // Récupérer les entrées des amis, avec les utilisateurs et les enfants
-        $friendsEntries = Auth::user()->allFriends()
+        $friendsEntries = $this->user->allFriends()
             ->load([
                 'entries' => function ($query) {
                     $query->whereNull('parent_entry_id')
-                        // ->whereDate('created_at', $today)
+                        // ->whereDate('created_at', now()->startOfDay())
                         ->with('user', 'childEntries');
                 }
             ])

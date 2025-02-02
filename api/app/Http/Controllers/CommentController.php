@@ -26,12 +26,14 @@ class CommentController extends Controller
      */
     public function store(Request $request, $entryId): JsonResponse
     {
-        // TODO: verify if this entry is a entry form a friend
         $request->validate([
             'text' => 'required|string',
         ]);
 
-        $entry = Entry::find($entryId);
+        $entry = Entry::where(function ($query) {
+            $query->where('user_id', operator: $this->user->id)
+                ->orWhereIn('user_id', $this->user->friends->pluck('id'));
+        })->findOrFail($entryId);
 
         $comment = $entry->comments()->create([
             'text' => $request->input('text'),
@@ -39,23 +41,6 @@ class CommentController extends Controller
         ]);
 
         return response()->json($comment, 201);
-    }
-
-    /**
-     * Show comments of an entry.
-     *
-     * @param  int  $entryId
-     * @return JsonResponse
-     */
-    public function show($entryId): JsonResponse
-    {
-        // TODO: show should be done via entrycontroller show method ?
-        $entry = Entry::findOrFail($entryId);
-
-        $comments = $entry->comments->load('user');
-
-        return response()->json($comments);
-
     }
 
     /**

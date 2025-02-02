@@ -17,16 +17,14 @@ import * as Haptics from "expo-haptics";
 import ProfilePicture from "../components/ProfilePicture";
 
 const DetailScreen = ({ route, navigation }) => {
-  const { entryId } = route.params; // Récupérez l'ID de l'entrée
+  const { entryId } = route.params;
   const { user } = useUser();
-  const [entry, setEntry] = useState(null); // Stocker les détails de l'entrée
+  const [entry, setEntry] = useState(null);
   const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     if (user.token && entryId) {
-      fetchEntryDetails(); // Fetch les détails de l'entrée
-      fetchComments();
+      fetchEntryDetails();
     }
   }, [user.token, entryId]);
 
@@ -43,22 +41,6 @@ const DetailScreen = ({ route, navigation }) => {
     } catch (error) {
       console.error("Error fetching entry details:", error);
       Alert.alert("Error", "Failed to fetch entry details.");
-    }
-  };
-
-  const fetchComments = async () => {
-    try {
-      const response = await fetch(`${process.env.API_URL}/api/comments/${entryId}`, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      const data = await response.json();
-      setComments(data);
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-      Alert.alert("Error", "Failed to fetch comments.");
     }
   };
 
@@ -83,37 +65,13 @@ const DetailScreen = ({ route, navigation }) => {
         throw new Error("Failed to post comment");
       }
 
-      fetchComments(); // Re-fetch comments
-      setCommentText(""); // Clear the input field
+      fetchEntryDetails();
+      setCommentText("");
     } catch (error) {
       console.error("Error posting comment:", error);
       Alert.alert("Error", "Could not post comment.");
     }
   };
-
-  interface Entry {
-    id: string;
-    text: string;
-    created_at: string;
-    location?: string;
-    user: {
-      id: string;
-      username: string;
-      profileImageUrl: string;
-    };
-    child_entries: Entry[];
-  }
-
-  interface Comment {
-    id: string;
-    text: string;
-    created_at: string;
-    user: {
-      id: string;
-      username: string;
-      profileImageUrl: string;
-    };
-  }
 
   const getTimeAgo = (date: Date): string => {
     const now = new Date();
@@ -201,7 +159,7 @@ const DetailScreen = ({ route, navigation }) => {
               ))}
             </View>
             <Text style={styles.commentsTitle}>Comments</Text>
-            {comments.map((item) => (
+            {entry.comments.map((item) => (
               <View key={item.id} style={styles.comment}>
                 <TouchableOpacity
                   onPress={() => navigateToUserProfile(item.user.id)}

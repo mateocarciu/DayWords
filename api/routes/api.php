@@ -25,6 +25,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/entries', EntryController::class);
     Route::get('/friends-entries', [EntryController::class, 'getFriendsEntries']);
 
-    Route::get('/comments/{entryId}', [CommentController::class, 'show']);
     Route::post('/comments/{entryId}', [CommentController::class, 'store']);
 });
