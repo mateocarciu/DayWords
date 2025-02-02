@@ -3,35 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Entry;
+use App\Models\Comment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
-    /**
-     * Récupère les commentaires d'une entrée spécifique.
-     *
-     * @param  int  $entryId
-     * @return JsonResponse
-     */
-    public function show($entryId): JsonResponse
+    protected $user;
+
+    public function __construct()
     {
-        // Trouver l'entrée par ID
-        $entry = Entry::find($entryId);
-
-        // Vérifier si l'entrée existe
-        if (!$entry) {
-            return response()->json(['message' => 'Entry not found'], 404);
-        }
-
-        // Charger les commentaires associés à l'entrée
-        $comments = $entry->comments->load('user');
-
-        return response()->json($comments);
+        $this->user = Auth::user();
     }
 
     /**
-     * Crée un nouveau commentaire pour une entrée spécifique.
+     * Create a new comment.
      *
      * @param  Request  $request
      * @param  int  $entryId
@@ -39,30 +26,40 @@ class CommentController extends Controller
      */
     public function store(Request $request, $entryId): JsonResponse
     {
-        // Valider les données de la requête
+        // TODO: verify if this entry is a entry form a friend
         $request->validate([
             'text' => 'required|string',
         ]);
 
-        // Trouver l'entrée par ID
         $entry = Entry::find($entryId);
 
-        // Vérifier si l'entrée existe
-        if (!$entry) {
-            return response()->json(['message' => 'Entry not found'], 404);
-        }
-
-        // Créer un nouveau commentaire
         $comment = $entry->comments()->create([
             'text' => $request->input('text'),
-            'user_id' => auth()->id(),
+            'user_id' => $this->user->id,
         ]);
 
         return response()->json($comment, 201);
     }
 
     /**
-     * Supprime un commentaire spécifique.
+     * Show comments of an entry.
+     *
+     * @param  int  $entryId
+     * @return JsonResponse
+     */
+    public function show($entryId): JsonResponse
+    {
+        // TODO: show should be done via entrycontroller show method ?
+        $entry = Entry::findOrFail($entryId);
+
+        $comments = $entry->comments->load('user');
+
+        return response()->json($comments);
+
+    }
+
+    /**
+     * Delete a comment.
      *
      * @param  int  $entryId
      * @param  int  $commentId
@@ -70,28 +67,11 @@ class CommentController extends Controller
      */
     public function delete($entryId, $commentId): JsonResponse
     {
-        // Trouver l'entrée par ID
-        $entry = Entry::find($entryId);
+        $comment = Comment::findOrFail($commentId)
+            ->where('entry_id', $entryId)
+            ->where('user_id', $this->user->id)
+            ->first();
 
-        // Vérifier si l'entrée existe
-        if (!$entry) {
-            return response()->json(['message' => 'Entry not found'], 404);
-        }
-
-        // Trouver le commentaire par ID
-        $comment = $entry->comments()->find($commentId);
-
-        // Vérifier si le commentaire existe
-        if (!$comment) {
-            return response()->json(['message' => 'Comment not found'], 404);
-        }
-
-        // Vérifier si l'utilisateur est autorisé à supprimer le commentaire
-        if ($comment->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        // Supprimer le commentaire
         $comment->delete();
 
         return response()->json(['message' => 'Comment deleted'], 200);

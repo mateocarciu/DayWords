@@ -12,9 +12,8 @@ class EntryController extends Controller
 {
     public function index()
     {
-        $today = now()->startOfDay();
         $entries = Auth::user()->entries()
-            // ->whereDate('created_at', $today)
+            // ->whereDate('created_at', now()->startOfDay())
             ->with(['comments', 'childEntries'])
             ->get();
 
@@ -67,8 +66,6 @@ class EntryController extends Controller
     {
         $entry = Entry::findOrFail($id);
 
-        // $this->authorize('update', $entry);
-
         $request->validate([
             'text' => 'sometimes|required|string',
             'time' => 'sometimes|required',
@@ -84,12 +81,9 @@ class EntryController extends Controller
         return response()->json($entry);
     }
 
-    // Suppression d'une entrée
     public function destroy($id)
     {
         $entry = Entry::findOrFail($id);
-
-        // $this->authorize('delete', $entry);
 
         $entry->delete();
 
