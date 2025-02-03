@@ -58,7 +58,7 @@ class EntryController extends Controller
         // info(Auth::user());
 
         // broadcast(new NewEntry(Auth::user()->friends, Auth::user()));
-        broadcast(new NewEntry($this->user->friends, $this->user));
+        // broadcast(new NewEntry($this->user->friends, $this->user));
 
 
         return response()->json(201);

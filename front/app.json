@@ -3,6 +3,7 @@
     "name": "DayWords",
     "slug": "daywords",
     "version": "1.0.0",
+    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
