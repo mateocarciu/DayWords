@@ -43,7 +43,6 @@ class Entry extends Model
         return $this->hasMany(Entry::class, 'parent_entry_id');
     }
 
-    // Scope pour les entrées racines
     public function scopeRootEntries($query)
     {
         return $query->whereNull('parent_entry_id');

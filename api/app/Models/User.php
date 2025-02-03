@@ -35,7 +35,6 @@ class User extends Authenticatable
 
     public function friends(): BelongsToMany
     {
-        // Les amis où l'utilisateur est dans la colonne `user_id`
         return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')
             ->withTimestamps();
     }

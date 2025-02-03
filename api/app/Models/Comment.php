@@ -14,8 +14,8 @@ class Comment extends Model
         'text',
         'time',
         'date',
-        'entry_id',  // Ajout de la clé étrangère entry_id
-        'user_id',   // Ajout de la clé étrangère user_id
+        'entry_id',
+        'user_id',
     ];
 
     public function entry(): BelongsTo

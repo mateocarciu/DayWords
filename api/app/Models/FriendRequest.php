@@ -13,8 +13,8 @@ class FriendRequest extends Model
     protected $fillable = [
         'status',
         'date',
-        'sender_id',    // Ajout de la clé étrangère sender_id
-        'receiver_id',  // Ajout de la clé étrangère receiver_id
+        'sender_id',
+        'receiver_id',
     ];
 
     public function sender(): BelongsTo

@@ -14,7 +14,7 @@ class Notification extends Model
         'type',
         'message',
         'date',
-        'user_id',  // Ajout de la clé étrangère user_id
+        'user_id',
     ];
 
     public function user(): BelongsTo
