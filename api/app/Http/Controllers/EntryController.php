@@ -25,7 +25,23 @@ class EntryController extends Controller
             ->where('parent_entry_id', null)
             ->get();
 
-        return response()->json($entries);
+        $friendsEntries = $this->user->allFriends()
+            ->load([
+                'entries' => function ($query) {
+                    $query->whereNull('parent_entry_id')
+                        // ->whereDate('created_at', now()->startOfDay())
+                        ->with('user', 'childEntries');
+                }
+            ])
+            ->pluck('entries')
+            ->flatten();
+
+        $allEntries = [
+            'entries' => $entries,
+            'friend_entries' => $friendsEntries
+        ];
+
+        return response()->json($allEntries);
     }
 
     public function store(Request $request)
@@ -102,21 +118,5 @@ class EntryController extends Controller
         $entry->delete();
 
         return response()->json(null, 204);
-    }
-
-    public function getFriendsEntries()
-    {
-        $friendsEntries = $this->user->allFriends()
-            ->load([
-                'entries' => function ($query) {
-                    $query->whereNull('parent_entry_id')
-                        // ->whereDate('created_at', now()->startOfDay())
-                        ->with('user', 'childEntries');
-                }
-            ])
-            ->pluck('entries')
-            ->flatten();
-
-        return response()->json($friendsEntries);
     }
 }

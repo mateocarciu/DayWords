@@ -23,7 +23,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/friend-requests/{id}', [FriendController::class, 'handleFriendRequest']);
 
     Route::apiResource('/entries', EntryController::class);
-    Route::get('/friends-entries', [EntryController::class, 'getFriendsEntries']);
 
     Route::post('/comments/{entryId}', [CommentController::class, 'store']);
 });

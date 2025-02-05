@@ -346,7 +346,7 @@ const FriendsScreen = ({ navigation }) => {
                 {...props}
                 indicatorStyle={{ backgroundColor: "#6200ee" }}
                 style={{ backgroundColor: "white" }}
-                labelStyle={{ color: "#6200ee", fontWeight: "bold" }}
+                // labelStyle={{ color: "#6200ee", fontWeight: "bold" }}
               />
             )}
           />

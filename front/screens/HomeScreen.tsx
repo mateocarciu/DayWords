@@ -20,7 +20,6 @@ const HomeScreen = ({ navigation }) => {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setTimeout(() => {
-      fetchFriendsEntries();
       fetchUserEntries();
       setRefreshing(false);
     }, 2000);
@@ -34,7 +33,6 @@ const HomeScreen = ({ navigation }) => {
   //         'Nouvelle entrée',
   //         `${event.sender.username} a posté une nouvelle entrée`
   //       );
-  //       fetchFriendsEntries();
   //       fetchUserEntries();
   //     });
   
@@ -47,7 +45,6 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     if (echo && user) {
       fetchUserEntries();
-      fetchFriendsEntries();
     }
   }, [user, echo]);
 
@@ -59,28 +56,12 @@ const HomeScreen = ({ navigation }) => {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      const userEntries = await response.json();
-      setThreadEntries(userEntries.filter((entry) => !entry.parent_entry_id));
+      const data = await response.json();
+      setThreadEntries( data.entries);
+      setFriendsEntries( data.friend_entries);
     } catch (error) {
       console.error("Error fetching user entries:", error);
       Alert.alert("Error", "Failed to fetch user entries.");
-    }
-  };
-
-  const fetchFriendsEntries = async () => {
-    try {
-      const response = await fetch(`${process.env.API_URL}/api/friends-entries`, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-
-      const friendsEntries = await response.json();
-      setFriendsEntries(friendsEntries);
-    } catch (error) {
-      console.error("Error fetching friends' entries:", error);
-      Alert.alert("Error", "Failed to fetch friends' entries.");
     }
   };
 

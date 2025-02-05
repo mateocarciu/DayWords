@@ -19,7 +19,7 @@ const App = () => {
   return (
     <UserProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
+        <Stack.Navigator initialRouteName="Login" id={undefined}>
           <Stack.Screen
             name="SignUp"
             component={SignUpScreen}
