@@ -20,7 +20,7 @@ const HomeScreen = ({ navigation }) => {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setTimeout(() => {
-      fetchUserEntries();
+      fetchEntries();
       setRefreshing(false);
     }, 2000);
   }, [user]);
@@ -33,7 +33,7 @@ const HomeScreen = ({ navigation }) => {
   //         'Nouvelle entrée',
   //         `${event.sender.username} a posté une nouvelle entrée`
   //       );
-  //       fetchUserEntries();
+  //       fetchEntries();
   //     });
   
   //     return () => {
@@ -44,11 +44,11 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (echo && user) {
-      fetchUserEntries();
+      fetchEntries();
     }
   }, [user, echo]);
 
-  const fetchUserEntries = async () => {
+  const fetchEntries = async () => {
     try {
       const response = await fetch(`${process.env.API_URL}/api/entries`, {
         headers: {
@@ -80,7 +80,7 @@ const HomeScreen = ({ navigation }) => {
     try {
       await saveEntry(newEntryData);
       setText("");
-      fetchUserEntries();
+      fetchEntries();
     } catch (error) {
       console.error("Error saving entry:", error);
       Alert.alert("Error", "Could not save entry.");
