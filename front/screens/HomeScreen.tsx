@@ -7,7 +7,7 @@ import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "../hooks/UserContext";
 import * as Haptics from "expo-haptics";
 import ProfilePicture from "../components/ProfilePicture";
-import useEcho from "../hooks/Echo";
+// import useEcho from "../hooks/Echo";
 
 const HomeScreen = ({ navigation }) => {
   const { user } = useUser();
@@ -15,7 +15,13 @@ const HomeScreen = ({ navigation }) => {
   const [threadEntries, setThreadEntries] = useState([]);
   const [friendsEntries, setFriendsEntries] = useState([]);
   const [isRefreshing, setRefreshing] = useState(false);
-  const echo = useEcho();
+  // const [echo, setEcho] = useState(null);
+
+  useEffect(() => {
+    if (user.token) {
+      fetchEntries();
+    }
+  }, [user]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -26,9 +32,27 @@ const HomeScreen = ({ navigation }) => {
   }, [user]);
 
   // useEffect(() => {
-  //   if (echo && user) {
-  //     const channel = echo.private(`newEntry.${user.data.id}`);
-  //     channel.listen('NewEntry', (event) => {
+  //   const echoInstance = useEcho(user.token);
+  //   setEcho(echoInstance);
+  // }, [user]);
+
+  // useEffect(() => {
+  //   if (echo && user && user.data && user.data.id) {
+  //     echo.connector.socket.on('connect', () => {
+  //       console.log('Connected to WebSocket server');
+  //     });
+  
+  //     echo.connector.socket.on('disconnect', () => {
+  //       console.log('Disconnected from WebSocket server');
+  //     });
+  
+  //     echo.connector.socket.on('error', (error) => {
+  //       console.error('WebSocket Error:', error);
+  //     });
+  
+  //     const userId = user.data.id;
+  //     const channel = echo.private(`newEntry`);
+  //     channel.listen('NewEntry', (event) => { // Supprimer le '.' devant NewEntry
   //       Alert.alert(
   //         'Nouvelle entrée',
   //         `${event.sender.username} a posté une nouvelle entrée`
@@ -37,16 +61,13 @@ const HomeScreen = ({ navigation }) => {
   //     });
   
   //     return () => {
-  //       channel.stopListening('NewEntry');
+  //       channel.stopListening('.NewEntry');
+  //       echo.connector.socket.off('connect');
+  //       echo.connector.socket.off('disconnect');
+  //       echo.connector.socket.off('error');
   //     };
   //   }
-  // }, [user, echo]);
-
-  useEffect(() => {
-    if (echo && user) {
-      fetchEntries();
-    }
-  }, [user, echo]);
+  // }, [echo, user]);
 
   const fetchEntries = async () => {
     try {
@@ -57,8 +78,8 @@ const HomeScreen = ({ navigation }) => {
         },
       });
       const data = await response.json();
-      setThreadEntries( data.entries);
-      setFriendsEntries( data.friend_entries);
+      setThreadEntries(data.entries);
+      setFriendsEntries(data.friend_entries);
     } catch (error) {
       console.error("Error fetching user entries:", error);
       Alert.alert("Error", "Failed to fetch user entries.");

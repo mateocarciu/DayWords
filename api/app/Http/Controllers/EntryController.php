@@ -64,18 +64,10 @@ class EntryController extends Controller
             'parent_entry_id' => $request->parent_entry_id,
         ]);
 
-        // $receiver = User::find(4);
-        // $sender = User::find(Auth::user()->id);
-        // broadcast(new NewEntry($sender, $sender, $request->text));
+        // broadcast(new NewEntry($this->user->allFriends(), $this->user))->toOthers();
+        // $event = new NewEntry();
 
-        // Récupérer les amis de l'utilisateur
-        // $friends = Auth::user()->friends;
-        // info($friends);
-        // info(Auth::user());
-
-        // broadcast(new NewEntry(Auth::user()->friends, Auth::user()));
-        // broadcast(new NewEntry($this->user->friends, $this->user));
-
+        // broadcast($event);
 
         return response()->json(201);
     }

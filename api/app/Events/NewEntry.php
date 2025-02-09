@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -18,8 +19,8 @@ class NewEntry implements ShouldBroadcast
      * Create a new event instance.
      */
     public function __construct(
-        public Collection $receiver,
-        public User $sender,
+        // public Collection $receiver,
+        // public User $sender,
     ) {
         //
     }
@@ -29,15 +30,19 @@ class NewEntry implements ShouldBroadcast
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): array
+    // public function broadcastOn(): array
+    // {
+    //     info("Broadcasting to: ", $this->receiver->pluck('id')->toArray());
+    //     return $this->receiver->map(fn($friend) => new PrivateChannel("newEntry.{$friend->id}"))->toArray();
+    // }
+
+    public function broadcastOn()
     {
-        // Utilise $receiver pour obtenir les IDs des amis
-        $friendIds = $this->receiver->pluck('id')->toArray();
-
-        $channels = array_map(function ($friendId) {
-            return new PrivateChannel("newEntry.{$friendId}");
-        }, $friendIds);
-
-        return $channels;
+        return [new Channel('newEntry')];
     }
+
+    // public function broadcastAs()
+    // {
+    //     return 'NewEntry';
+    // }
 }
