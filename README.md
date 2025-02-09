@@ -11,11 +11,25 @@ composer install
 php artisan serve
 ```
 
-## Socket server
+Installer & démarrer redis (mac) :
 
 ```sh
-php artisan reverb:start --debug
-php artisan queue:listen
+brew install redis
+redis-server
+```
+
+## Socket server
+
+Démarrer la queue :
+
+```sh
+php artisan queue:work
+```
+
+Démarrer le laravel echo server :
+
+```sh
+laravel-echo-server start --debug
 ```
 
 ## Prérequis Frontend
