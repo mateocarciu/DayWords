@@ -1,4 +1,2 @@
-export const supabaseUrl: string = process.env
-  .EXPO_PUBLIC_SUPABASE_URL as string;
-export const supabaseAnonKey: string = process.env
-  .EXPO_PUBLIC_SUPABASE_ANONKEY as string;
+export const apiUrl: string = process.env
+  .EXPO_PUBLIC_API_URL as string;
