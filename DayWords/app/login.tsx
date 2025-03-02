@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { View, Text, TextInput, Pressable, Alert } from 'react-native'
+import { View, Text, Pressable, Alert } from 'react-native'
 import ScreenWarpper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
 import Icon from '@/assets/icons'
@@ -17,7 +17,6 @@ export default function login() {
 	const mailRef = useRef('')
 	const passwordRef = useRef('')
 	const [loading, setLoading] = useState(false)
-	// const authContext = useAuth()
 	const { setAuth } = useAuth() || {}
 
 	const onSubmit = async () => {

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { View, Text, Pressable, Alert, AppState } from 'react-native'
+import { View, Text, Pressable, Alert } from 'react-native'
 import ScreenWarpper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
 import Icon from '@/assets/icons'
@@ -30,27 +30,6 @@ export default function signUp() {
 
 		setLoading(true)
 
-		// const {
-		//   data: { session },
-		//   error,
-		// } = await supabase.auth.signUp({
-		//   email,
-		//   password,
-		//   options: {
-		//     data: { name },
-		//   }
-		// });
-
-		// console.log("session", session);
-		// console.log("error", error);
-
-		// if (error) {
-		//   Alert.alert("Sign Up", error.message);
-		//   setLoading(false);
-		//   return;
-		// }
-
-		// success work to-do
 		setLoading(false)
 	}
 
