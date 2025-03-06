@@ -24,13 +24,32 @@ export default function signUp() {
 			return
 		}
 
-		let name = nameRef.current.trim()
-		let email = mailRef.current.trim()
-		let password = passwordRef.current.trim()
-
 		setLoading(true)
 
-		setLoading(false)
+		try {
+			const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/register`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					username: nameRef.current.trim(),
+					email: mailRef.current.trim(),
+					password: passwordRef.current.trim()
+				})
+			})
+
+			const data = await response.json()
+
+			if (!response.ok) {
+				console.error(data)
+				throw new Error(data.message || 'Registration failed')
+			}
+			router.navigate('/login')
+		} catch (error: any) {
+			Alert.alert('Registration Failed', error.message)
+			console.error(error)
+		} finally {
+			setLoading(false)
+		}
 	}
 
 	return (
@@ -52,7 +71,7 @@ export default function signUp() {
 				{/* form */}
 				<View style={styles.form}>
 					<Text style={{ fontSize: hp(1.5), color: theme.colors.text }}>Please fill the details to create an account</Text>
-					<Input icon={<Icon name='user' size={26} strokeWidth={1.6} />} placeholder='Enter your name' onChangeText={(text) => (nameRef.current = text)} />
+					<Input icon={<Icon name='user' size={26} strokeWidth={1.6} />} placeholder='Enter your username' onChangeText={(text) => (nameRef.current = text)} />
 					<Input icon={<Icon name='mail' size={26} strokeWidth={1.6} />} placeholder='Enter your email' onChangeText={(text) => (mailRef.current = text)} />
 					<Input icon={<Icon name='lock' size={26} strokeWidth={1.6} />} placeholder='Enter your password' onChangeText={(text) => (passwordRef.current = text)} />
 					<Button title='Sign Up' loading={loading} onPress={onSubmit} />
