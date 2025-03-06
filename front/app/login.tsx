@@ -17,7 +17,7 @@ export default function login() {
 	const mailRef = useRef('')
 	const passwordRef = useRef('')
 	const [loading, setLoading] = useState(false)
-	const { setAuth } = useAuth() || {}
+	const { login } = useAuth()
 
 	const onSubmit = async () => {
 		if (!mailRef.current || !passwordRef.current) {
@@ -25,21 +25,32 @@ export default function login() {
 			return
 		}
 
-		let email = mailRef.current.trim()
-		let password = passwordRef.current.trim()
-
 		setLoading(true)
 
-		if (setAuth) {
-			setAuth({
-				id: 1,
-				username: 'test',
-				email: email,
-				token: 'azea'
+		try {
+			const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/login`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					email: mailRef.current.trim(),
+					password: passwordRef.current.trim()
+				})
 			})
+
+			const data = await response.json()
+
+			if (!response.ok) {
+				throw new Error(data.message || 'Login failed')
+			}
+
+			await login(data.access_token, data.user)
+			router.replace('/home')
+		} catch (error: any) {
+			Alert.alert('Login Failed', error.message)
+			console.error(error)
+		} finally {
+			setLoading(false)
 		}
-		router.replace('/home')
-		setLoading(false)
 	}
 
 	return (

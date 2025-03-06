@@ -1,36 +1,43 @@
-import React, { createContext, useContext } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { User } from '@/utils/types'
 
 interface AuthContextType {
 	user: User | null
-	setAuth: (authUser: Pick<User, 'id' | 'username' | 'email' | 'token'> | null) => void
-	setUserData: (data: Omit<User, 'id' | 'username' | 'email' | 'token'>) => void
+	login: (token: string, user: User) => Promise<void>
+	logout: () => Promise<void>
 }
 
-export const AuthContext = createContext<AuthContextType | null>(null)
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-	const [user, setUser] = React.useState<User | null>(null)
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+	const [user, setUser] = useState<User | null>(null)
 
-	const setAuth = (authUser: Pick<User, 'id' | 'username' | 'email' | 'token'> | null) => {
-		if (authUser === null) {
-			setUser(null)
-		} else {
-			setUser((prev) => ({
-				...prev,
-				id: authUser.id,
-				username: authUser.username,
-				email: authUser.email,
-				token: authUser.token
-			}))
+	useEffect(() => {
+		const loadUserData = async () => {
+			const storedUser = await AsyncStorage.getItem('user')
+			if (storedUser) setUser(JSON.parse(storedUser))
 		}
+		loadUserData()
+	}, [])
+
+	const login = async (token: string, userData: User) => {
+		await AsyncStorage.setItem('token', token)
+		await AsyncStorage.setItem('user', JSON.stringify(userData))
+		setUser(userData)
 	}
 
-	const setUserData = (data: Omit<User, 'id' | 'name' | 'email' | 'token'>) => {
-		setUser((prev) => (prev ? { ...prev, ...data } : prev))
+	const logout = async () => {
+		await AsyncStorage.removeItem('token')
+		await AsyncStorage.removeItem('user')
+		setUser(null)
 	}
 
-	return <AuthContext.Provider value={{ user, setAuth, setUserData }}>{children}</AuthContext.Provider>
+	return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>
 }
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuth = () => {
+	const context = useContext(AuthContext)
+	if (!context) throw new Error('useAuth must be used within an AuthProvider')
+	return context
+}

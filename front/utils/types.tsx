@@ -8,5 +8,4 @@ export interface User {
 	location?: string | null
 	created_at?: string | null
 	updated_at?: string | null
-	token: string | null
 }

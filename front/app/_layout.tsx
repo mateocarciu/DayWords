@@ -22,13 +22,12 @@ const MainLayout = () => {
 	const { user } = authContext
 
 	useEffect(() => {
-		console.log(user)
-		if (user) {
-			router.replace('/home')
-		} else {
+		if (user === null) {
 			router.replace('/')
+		} else {
+			router.replace('/home')
 		}
-	}, [])
+	}, [user])
 
 	return (
 		<Stack
