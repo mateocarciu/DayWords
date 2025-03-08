@@ -1,7 +1,7 @@
 import { theme } from '@/constants/theme'
 import { hp } from '@/helpers/common'
-import React from 'react'
-import { View, Text, StyleProp, ViewStyle, TouchableOpacity, TextStyle, Pressable, StyleSheet } from 'react-native'
+import React, { useRef } from 'react'
+import { View, Text, StyleProp, ViewStyle, TextStyle, Pressable, StyleSheet, Animated } from 'react-native'
 import Loading from './Loading'
 
 interface ButtonProps {
@@ -21,6 +21,23 @@ const Button: React.FC<ButtonProps> = ({ buttonStyle, textStyle, title = '', onP
 		shadowRadius: 8,
 		elevation: 4
 	}
+	const scaleValue = useRef(new Animated.Value(1)).current
+
+	const handlePressIn = () => {
+		Animated.spring(scaleValue, {
+			toValue: 0.9,
+			useNativeDriver: true
+		}).start()
+	}
+
+	const handlePressOut = () => {
+		Animated.spring(scaleValue, {
+			toValue: 1,
+			friction: 3,
+			useNativeDriver: true
+		}).start()
+	}
+
 	if (loading) {
 		return (
 			<View style={[styles.button, buttonStyle, { backgroundColor: 'white' }]}>
@@ -29,11 +46,13 @@ const Button: React.FC<ButtonProps> = ({ buttonStyle, textStyle, title = '', onP
 		)
 	}
 	return (
-		<Pressable style={[styles.button, buttonStyle, hasShadow && shadowStyle]} onPress={onPress} disabled={loading}>
-			<View>
-				<Text style={[styles.text, textStyle]}>{loading ? 'Loading...' : title}</Text>
-			</View>
-		</Pressable>
+		<Animated.View style={[{ transform: [{ scale: scaleValue }] }]}>
+			<Pressable style={[styles.button, buttonStyle, hasShadow && shadowStyle]} onPress={onPress} disabled={loading} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+				<View>
+					<Text style={[styles.text, textStyle]}>{loading ? 'Loading...' : title}</Text>
+				</View>
+			</Pressable>
+		</Animated.View>
 	)
 }
 

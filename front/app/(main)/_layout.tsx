@@ -5,6 +5,7 @@ export default function Layout() {
 		<Stack screenOptions={{ headerShown: false }}>
 			<Stack.Screen name='home' />
 			<Stack.Screen name='profile' />
+			<Stack.Screen name='newPost' options={{ animation: 'slide_from_bottom', animationDuration: 200 }} />
 		</Stack>
 	)
 }
