@@ -22,6 +22,7 @@ import Logout from './logout'
 import Image from './Image'
 import Video from './Video'
 import Friends from './Friends'
+import Info from './Info'
 
 // Define an object that maps icon names to components
 const icons = {
@@ -46,7 +47,8 @@ const icons = {
 	logout: Logout,
 	image: Image,
 	video: Video,
-	friends: Friends
+	friends: Friends,
+	info: Info
 } as const
 
 // Define the type for valid icon names

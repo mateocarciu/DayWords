@@ -67,27 +67,23 @@ const Profile = () => {
 						<Avatar username={user?.username ?? ''} size={hp(12)} rounded={theme.radius.xxl * 1.4} />
 					</View>
 
-					<View style={{ alignItems: 'center', gap: 4 }}>
+					<View style={{ alignItems: 'center', gap: 2 }}>
 						<Text style={styles.userName}>{user?.username || ''}</Text>
-						<Text>{user?.name || ''}</Text>
 					</View>
 
 					<View style={{ gap: 10 }}>
 						<View style={styles.info}>
+							<Icon name='user' size={20} color={theme.colors.textLight} />
+							<Text style={styles.infoText}>{user?.name}</Text>
+						</View>
+						<View style={styles.info}>
 							<Icon name='mail' size={20} color={theme.colors.textLight} />
 							<Text style={styles.infoText}>{user?.email || ''}</Text>
 						</View>
-						{user?.bio && (
-							<View style={styles.info}>
-								<Icon name='call' size={20} color={theme.colors.textLight} />
-								<Text style={styles.infoText}>{user?.bio}</Text>
-							</View>
-						)}
-						{user?.bio && (
-							<View style={styles.info}>
-								<Text style={styles.infoText}>{user?.bio}</Text>
-							</View>
-						)}
+						<View style={styles.info}>
+							<Icon name='info' size={20} color={theme.colors.textLight} />
+							<Text style={styles.infoText}>{user?.bio}</Text>
+						</View>
 					</View>
 				</View>
 			</View>
@@ -128,9 +124,9 @@ const styles = StyleSheet.create({
 	},
 	logoutBtn: {
 		position: 'absolute',
-		right: 0,
+		right: wp(4),
 		padding: 5,
 		borderRadius: theme.radius.sm,
-		backgroundColor: theme.colors.lightDark
+		backgroundColor: theme.colors.light
 	}
 })
