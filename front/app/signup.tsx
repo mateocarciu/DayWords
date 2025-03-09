@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { View, Text, Pressable, Alert } from 'react-native'
-import ScreenWarpper from '@/components/ScreenWrapper'
+import ScreenWrapper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
 import Icon from '@/assets/icons'
 import { StatusBar } from 'expo-status-bar'
@@ -29,7 +29,7 @@ export default function signUp() {
 		try {
 			const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/register`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
 				body: JSON.stringify({
 					username: nameRef.current.trim(),
 					email: mailRef.current.trim(),
@@ -53,7 +53,7 @@ export default function signUp() {
 	}
 
 	return (
-		<ScreenWarpper bg='white'>
+		<ScreenWrapper bg='white'>
 			<StatusBar style='dark' />
 			<View style={styles.container}>
 				<BackButton
@@ -93,7 +93,7 @@ export default function signUp() {
 					</View>
 				</View>
 			</View>
-		</ScreenWarpper>
+		</ScreenWrapper>
 	)
 }
 

@@ -5,6 +5,7 @@ const authFetch = async (url: string, options: RequestInit = {}) => {
     const token = await AsyncStorage.getItem('token');
     const headers = {
       'Content-Type': 'application/json',
+			Accept: 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     };

@@ -22,4 +22,5 @@ export interface Entry {
 	created_at: string
 	updated_at: string
 	child_entries: Entry[]
+	user: User
 }

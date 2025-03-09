@@ -1,23 +1,22 @@
 import Icon from '@/assets/icons'
 import Avatar from '@/components/Avatar'
 import FloatingButton from '@/components/FloatingButton'
-import ScreenWarpper from '@/components/ScreenWrapper'
+import ScreenWrapper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
 import { useAuth } from '@/contexts/AuthContext'
 import { hp, wp } from '@/helpers/common'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState, useCallback } from 'react'
 import { View, Text, StyleSheet, Alert, Pressable, FlatList } from 'react-native'
-// import PostCard from "@/components/PostCard";
 import Loading from '@/components/Loading'
 import { Entry } from '@/utils/types'
 import authFetch from '@/helpers/authFetch'
+import EntryComponent from '@/components/EntryComponent'
 
 const home = () => {
 	const authContext = useAuth()
 	const router = useRouter()
-	const [userEntries, setUserEntries] = useState<Entry[]>([])
-	const [friendsEntries, setFriendsEntries] = useState<Entry[]>([])
+	const [entries, setEntries] = useState<Entry[]>([])
 	const [isRefreshing, setRefreshing] = useState(false)
 
 	if (!authContext) {
@@ -27,7 +26,6 @@ const home = () => {
 	const { user } = authContext
 
 	useEffect(() => {
-		console.log('Home Screen - useEffect')
 		refresh()
 	}, [])
 
@@ -42,8 +40,8 @@ const home = () => {
 			const response = await authFetch(`${process.env.EXPO_PUBLIC_API_URL}/api/entries`, {
 				method: 'GET'
 			})
-			setUserEntries(response.entries)
-			setFriendsEntries(response.friend_entries)
+			setEntries(response)
+			console.log('Entries:', response)
 		} catch (error: any) {
 			console.error('Error fetching entries', error)
 			Alert.alert('Error fetching entries', `Code: ${error.status} - ${error.message}`)
@@ -51,7 +49,7 @@ const home = () => {
 	}
 
 	return (
-		<ScreenWarpper autoDismissKeyboard={false}>
+		<ScreenWrapper autoDismissKeyboard={false} scrollEnabled={true}>
 			<View style={styles.container}>
 				<FloatingButton onPress={() => router.push('/newPost')} />
 				{/* header */}
@@ -59,27 +57,18 @@ const home = () => {
 					<Pressable>
 						<Icon name='friends' size={hp(4.3)} strokeWidth={1.5} color={theme.colors.text} />
 					</Pressable>
-					<Text style={styles.title}>DayWords</Text>
+					<Text style={styles.title} onPress={refresh}>
+						DayWords
+					</Text>
 					<View style={styles.icons}>
 						<Pressable onPress={() => router.push('/profile')}>
 							<Avatar username={user?.username || ''} size={hp(4.3)} rounded={theme.radius.sm} style={{ borderWidth: 2 }} />
 						</Pressable>
 					</View>
 				</View>
-
-				<FlatList
-					data={userEntries}
-					keyExtractor={(item) => item.id.toString()}
-					renderItem={({ item }) => (
-						<View>
-							<Text>{item.text}</Text>
-						</View>
-					)}
-					refreshing={isRefreshing}
-					onRefresh={refresh}
-				/>
+				<View style={{ flex: 1 }}>{user && <EntryComponent entries={entries} currentUserId={user.id} isRefreshing={isRefreshing} onRefresh={refresh} />}</View>
 			</View>
-		</ScreenWarpper>
+		</ScreenWrapper>
 	)
 }
 

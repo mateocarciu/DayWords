@@ -21,25 +21,21 @@ class EntryController extends Controller
     {
         $entries = $this->user->entries()
             // ->whereDate('created_at', now()->startOfDay())
-            ->with(['childEntries'])
             ->where('parent_entry_id', null)
+            ->with('user', 'childEntries')
             ->get();
 
         $friendsEntries = $this->user->allFriends()
             ->load([
                 'entries' => function ($query) {
                     $query->whereNull('parent_entry_id')
-                        // ->whereDate('created_at', now()->startOfDay())
                         ->with('user', 'childEntries');
                 }
             ])
             ->pluck('entries')
             ->flatten();
 
-        $allEntries = [
-            'entries' => $entries,
-            'friend_entries' => $friendsEntries
-        ];
+        $allEntries = $entries->merge($friendsEntries);
 
         return response()->json($allEntries);
     }

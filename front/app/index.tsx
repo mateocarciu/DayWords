@@ -1,4 +1,4 @@
-import ScreenWarpper from '@/components/ScreenWrapper'
+import ScreenWrapper from '@/components/ScreenWrapper'
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native'
@@ -11,7 +11,7 @@ export default function index() {
 	const router = useRouter()
 
 	return (
-		<ScreenWarpper>
+		<ScreenWrapper>
 			<StatusBar style='dark' />
 			<View style={styles.container}>
 				<Image style={styles.welcomeImage} source={require('../assets/images/welcome1.png')} resizeMode='contain' />
@@ -41,7 +41,7 @@ export default function index() {
 					</View>
 				</View>
 			</View>
-		</ScreenWarpper>
+		</ScreenWrapper>
 	)
 }
 

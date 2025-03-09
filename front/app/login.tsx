@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { View, Text, Pressable, Alert } from 'react-native'
-import ScreenWarpper from '@/components/ScreenWrapper'
+import ScreenWrapper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
 import Icon from '@/assets/icons'
 import { StatusBar } from 'expo-status-bar'
@@ -30,7 +30,10 @@ export default function login() {
 		try {
 			const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/login`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json'
+				},
 				body: JSON.stringify({
 					email: mailRef.current.trim(),
 					password: passwordRef.current.trim()
@@ -54,7 +57,7 @@ export default function login() {
 	}
 
 	return (
-		<ScreenWarpper bg='white'>
+		<ScreenWrapper bg='white'>
 			<StatusBar style='dark' />
 			<View style={styles.container}>
 				<BackButton
@@ -92,7 +95,7 @@ export default function login() {
 					</View>
 				</View>
 			</View>
-		</ScreenWarpper>
+		</ScreenWrapper>
 	)
 }
 

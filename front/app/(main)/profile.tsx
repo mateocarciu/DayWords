@@ -1,7 +1,7 @@
 import Icon from '@/assets/icons'
 import Avatar from '@/components/Avatar'
 import Header from '@/components/Header'
-import ScreenWarpper from '@/components/ScreenWrapper'
+import ScreenWrapper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
 import { useAuth } from '@/contexts/AuthContext'
 import { hp, wp } from '@/helpers/common'
@@ -54,7 +54,7 @@ const Profile = () => {
 	}
 
 	return (
-		<ScreenWarpper autoDismissKeyboard={false}>
+		<ScreenWrapper autoDismissKeyboard={false}>
 			<View style={styles.headerContainer}>
 				<Header title='Profile' marginBottom={30} />
 				<TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
@@ -87,7 +87,7 @@ const Profile = () => {
 					</View>
 				</View>
 			</View>
-		</ScreenWarpper>
+		</ScreenWrapper>
 	)
 }
 

@@ -3,7 +3,7 @@ import Avatar from '@/components/Avatar'
 import Button from '@/components/Button'
 import Header from '@/components/Header'
 import RichTextEditor from '@/components/RichTextEditor'
-import ScreenWarpper from '@/components/ScreenWrapper'
+import ScreenWrapper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
 import { useAuth } from '@/contexts/AuthContext'
 import { hp, wp } from '@/helpers/common'
@@ -89,7 +89,7 @@ const newPosts = () => {
 	}, [])
 
 	return (
-		<ScreenWarpper autoDismissKeyboard={false}>
+		<ScreenWrapper autoDismissKeyboard={false}>
 			<View style={styles.container}>
 				<Header title='Create a new post' />
 				<ScrollView contentContainerStyle={{ gap: 20 }} showsVerticalScrollIndicator={false}>
@@ -121,7 +121,7 @@ const newPosts = () => {
 					{isKeyboardShow && <View style={{ height: hp(35) }}></View>}
 				</ScrollView>
 			</View>
-		</ScreenWarpper>
+		</ScreenWrapper>
 	)
 }
 
