@@ -7,11 +7,10 @@ import { useAuth } from '@/contexts/AuthContext'
 import { hp, wp } from '@/helpers/common'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState, useCallback } from 'react'
-import { View, Text, StyleSheet, Alert, Pressable, FlatList } from 'react-native'
-import Loading from '@/components/Loading'
+import { View, Text, StyleSheet, Alert, Pressable } from 'react-native'
 import { Entry } from '@/utils/types'
 import authFetch from '@/helpers/authFetch'
-import EntryComponent from '@/components/EntryComponent'
+import EntryList from '@/components/entry/EntryList'
 
 const home = () => {
 	const authContext = useAuth()
@@ -66,7 +65,7 @@ const home = () => {
 						</Pressable>
 					</View>
 				</View>
-				<View style={{ flex: 1 }}>{user && <EntryComponent entries={entries} currentUserId={user.id} isRefreshing={isRefreshing} onRefresh={refresh} />}</View>
+				<View style={{ flex: 1 }}>{user && <EntryList entries={entries} currentUserId={user.id} isRefreshing={isRefreshing} onRefresh={refresh} />}</View>
 			</View>
 		</ScreenWrapper>
 	)
@@ -78,6 +77,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		marginHorizontal: wp(4)
+		// backgroundColor: 'red'
 	},
 	header: {
 		flexDirection: 'row',
