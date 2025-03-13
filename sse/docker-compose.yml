@@ -1,0 +1,13 @@
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+
+  node-sse:
+    build:
+      context: ./node-sse
+    ports:
+      - '4000:4000'
+    depends_on:
+      - redis

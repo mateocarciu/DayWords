@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Entry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use App\Events\NewEntry;
+use Illuminate\Support\Facades\Redis;
 
 class EntryController extends Controller
 {
@@ -51,7 +50,7 @@ class EntryController extends Controller
             'parent_entry_id' => 'nullable|exists:entries,id',
         ]);
 
-        $this->user->entries()->create([
+        $entry = $this->user->entries()->create([
             'text' => $request->text,
             'location' => $request->location,
             'emotion' => $request->emotion,
@@ -60,12 +59,17 @@ class EntryController extends Controller
             'parent_entry_id' => $request->parent_entry_id,
         ]);
 
-        // broadcast(new NewEntry($this->user->allFriends(), $this->user))->toOthers();
-        // $event = new NewEntry();
+        $friends = $this->user->allFriends();
 
-        // broadcast($event);
+        foreach ($friends as $friend) {
+            Redis::publish('user.' . $friend->id, json_encode([
+                'entry_id' => $entry->id,
+                'title' => 'New entry created!',
+                'text' => $entry->text,
+            ]));
+        }
 
-        return response()->json(201);
+        return response()->json($entry, 201);
     }
 
     public function show($id)

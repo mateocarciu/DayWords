@@ -11,12 +11,12 @@ import { View, Text, StyleSheet, Alert, Pressable } from 'react-native'
 import { Entry } from '@/utils/types'
 import authFetch from '@/helpers/authFetch'
 import EntryList from '@/components/entry/EntryList'
+import useSSE from '@/hooks/useSSE'
 
 const home = () => {
 	const authContext = useAuth()
 	const router = useRouter()
 	const [entries, setEntries] = useState<Entry[]>([])
-	const [isRefreshing, setRefreshing] = useState(false)
 
 	if (!authContext) {
 		console.error('AuthContext is not found')
@@ -29,10 +29,15 @@ const home = () => {
 	}, [])
 
 	const refresh = useCallback(async () => {
-		setRefreshing(true)
 		await fetchEntries()
-		setRefreshing(false)
 	}, [])
+
+	useSSE({
+		userId: user?.id,
+		onNewEntry: () => {
+			refresh()
+		}
+	})
 
 	const fetchEntries = async () => {
 		try {
@@ -65,7 +70,7 @@ const home = () => {
 						</Pressable>
 					</View>
 				</View>
-				<View style={{ flex: 1 }}>{user && <EntryList entries={entries} currentUserId={user.id} isRefreshing={isRefreshing} onRefresh={refresh} />}</View>
+				<View style={{ flex: 1 }}>{user && <EntryList entries={entries} currentUserId={user.id} isRefreshing={false} onRefresh={refresh} />}</View>
 			</View>
 		</ScreenWrapper>
 	)

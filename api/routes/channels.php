@@ -2,11 +2,6 @@
 
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('newEntry', function ($user) {
-    return true;
+Broadcast::channel('user.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
 });
-
-
-// Broadcast::channel('newEntry.{id}', function ($user, $id) {
-//     return $user->allFriends()->contains('id', $id);
-// });

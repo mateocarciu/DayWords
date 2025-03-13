@@ -1,6 +1,5 @@
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, View, Text, Platform, TextInput } from 'react-native'
 import React from 'react'
-import { actions, IconRecord, RichEditor, RichToolbar } from 'react-native-pell-rich-editor'
 import { hp } from '@/helpers/common'
 import { theme } from '@/constants/theme'
 
@@ -10,13 +9,25 @@ interface RichTextEditorProps {
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ editorRef = null, onChange }) => {
+	if (Platform.OS === 'web') {
+		// ✅ Version wen : on utilise un TextInput
+		return (
+			<View style={styles.webContainer}>
+				<TextInput multiline placeholder='Type something about your day...' style={styles.webTextInput} onChangeText={onChange} />
+			</View>
+		)
+	}
+
+	// ✅ Version mobile
+	const { RichEditor, RichToolbar, actions, IconRecord } = require('react-native-pell-rich-editor')
+
 	return (
 		<View style={{ minHeight: 285 }}>
 			<RichToolbar
 				actions={[actions.setStrikethrough, actions.removeFormat, actions.setBold, actions.setItalic, actions.insertOrderedList, actions.blockquote, actions.alignLeft, actions.alignCenter, actions.alignRight, actions.code, actions.line, actions.heading1, actions.heading4]}
 				iconMap={{
-					[actions.heading1]: ({ tintColor }: IconRecord) => <Text style={[styles.tib, { color: tintColor }]}>H1</Text>,
-					[actions.heading4]: ({ tintColor }: IconRecord) => <Text style={[styles.tib, { color: tintColor }]}>H4</Text>
+					[actions.heading1]: ({ tintColor }: typeof IconRecord) => <Text style={[styles.tib, { color: tintColor }]}>H1</Text>,
+					[actions.heading4]: ({ tintColor }: typeof IconRecord) => <Text style={[styles.tib, { color: tintColor }]}>H4</Text>
 				}}
 				style={styles.richBar}
 				flatContainerStyle={styles.flatListStyle}
@@ -75,5 +86,18 @@ const styles = StyleSheet.create({
 		borderRadius: theme.radius.xl,
 		borderCurve: 'continuous',
 		borderColor: theme.colors.gray
+	},
+	webContainer: {
+		minHeight: 285,
+		borderWidth: 1.5,
+		borderRadius: theme.radius.xl,
+		borderColor: theme.colors.gray,
+		padding: 10
+	},
+	webTextInput: {
+		height: 240,
+		fontSize: hp(2),
+		color: theme.colors.text,
+		textAlignVertical: 'top'
 	}
 })
