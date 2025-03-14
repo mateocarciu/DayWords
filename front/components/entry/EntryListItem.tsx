@@ -85,7 +85,11 @@ const EntryListItem: React.FC<EntryListItemProps> = ({ entry, currentUserId, onL
 			{hasThreads && <ThreadEntries entries={entry.child_entries} currentUserId={currentUserId} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onShareEntry={onShareEntry} />}
 
 			<View style={styles.replyFormContainer}>
-				<View />
+				{entry.more_entries > 0 && (
+					<TouchableOpacity style={styles.moreEntriesChip} onPress={() => onReplyEntry && onReplyEntry(entry)}>
+						<Text style={styles.moreEntriesChipText}>+{entry.more_entries} posts</Text>
+					</TouchableOpacity>
+				)}
 				<ReplyForm replyText={replyText} onChangeText={setReplyText} onSend={handleReply} />
 			</View>
 		</View>
@@ -113,6 +117,7 @@ const styles = StyleSheet.create({
 	},
 	replyFormContainer: {
 		flexDirection: 'row',
+		alignItems: 'center',
 		marginLeft: wp(8),
 		marginTop: hp(0.5)
 	},
@@ -158,6 +163,15 @@ const styles = StyleSheet.create({
 		color: theme.colors.textLight,
 		fontSize: hp(1.6),
 		marginLeft: wp(1)
+	},
+	moreEntriesChip: {
+		marginRight: wp(2)
+	},
+
+	moreEntriesChipText: {
+		color: theme.colors.primary,
+		fontSize: hp(1.6),
+		fontWeight: theme.fonts.medium
 	}
 })
 

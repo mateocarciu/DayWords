@@ -22,5 +22,6 @@ export interface Entry {
 	created_at: string
 	updated_at: string
 	child_entries: Entry[]
+	more_entries: number
 	user: User
 }

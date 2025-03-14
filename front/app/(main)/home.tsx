@@ -45,7 +45,7 @@ const home = () => {
 				method: 'GET'
 			})
 			setEntries(response)
-			console.log('Entries:', response)
+			// console.log('Entries:', response)
 		} catch (error: any) {
 			console.error('Error fetching entries', error)
 			Alert.alert('Error fetching entries', `Code: ${error.status} - ${error.message}`)
@@ -56,7 +56,6 @@ const home = () => {
 		<ScreenWrapper autoDismissKeyboard={false} scrollEnabled={true}>
 			<View style={styles.container}>
 				<FloatingButton onPress={() => router.push('/newPost')} />
-				{/* header */}
 				<View style={styles.header}>
 					<Pressable>
 						<Icon name='friends' size={hp(4.3)} strokeWidth={1.5} color={theme.colors.text} />

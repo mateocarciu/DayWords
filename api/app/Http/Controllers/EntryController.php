@@ -19,16 +19,27 @@ class EntryController extends Controller
     public function index()
     {
         $entries = $this->user->entries()
-            // ->whereDate('created_at', now()->startOfDay())
             ->where('parent_entry_id', null)
-            ->with('user', 'childEntries')
+            ->whereDate('created_at', now()->toDateString())
+            ->with([
+                'user',
+                'childEntries' => function ($query) {
+                    $query->orderBy('created_at');
+                }
+            ])
             ->get();
 
         $friendsEntries = $this->user->allFriends()
             ->load([
                 'entries' => function ($query) {
                     $query->whereNull('parent_entry_id')
-                        ->with('user', 'childEntries');
+                        ->whereDate('created_at', now()->toDateString())
+                        ->with([
+                            'user',
+                            'childEntries' => function ($query) {
+                                $query->orderBy('created_at');
+                            }
+                        ]);
                 }
             ])
             ->pluck('entries')
@@ -36,7 +47,24 @@ class EntryController extends Controller
 
         $allEntries = $entries->merge($friendsEntries);
 
-        return response()->json($allEntries);
+        $formattedEntries = $allEntries->map(function ($entry) {
+
+            $totalChildEntries = $entry->childEntries->count();
+
+            $limitedChildEntries = $entry->childEntries->take(2);
+
+            $entry->child_entries = $limitedChildEntries;
+
+            unset($entry->childEntries);
+
+            $remainingChildEntries = max(0, $totalChildEntries - 2);
+
+            $entry->more_entries = $remainingChildEntries;
+
+            return $entry;
+        });
+
+        return response()->json($formattedEntries);
     }
 
     public function store(Request $request)
@@ -47,17 +75,26 @@ class EntryController extends Controller
             'emotion' => 'nullable|in:HAPPY,SAD,ANGRY,EXCITED,RELAXED,OTHER',
             'mediaUrl' => 'nullable|string',
             'public' => 'nullable|boolean',
-            'parent_entry_id' => 'nullable|exists:entries,id',
         ]);
 
-        $entry = $this->user->entries()->create([
-            'text' => $request->text,
-            'location' => $request->location,
-            'emotion' => $request->emotion,
-            'mediaUrl' => $request->mediaUrl,
-            'public' => $request->public,
-            'parent_entry_id' => $request->parent_entry_id,
-        ]);
+        if ($this->user->entries()->whereDate('created_at', now()->toDateString())->exists()) {
+            $entry = $this->user->entries()->create([
+                'text' => $request->text,
+                'location' => $request->location,
+                'emotion' => $request->emotion,
+                'mediaUrl' => $request->mediaUrl,
+                'public' => $request->public,
+                'parent_entry_id' => $this->user->entries()->whereDate('created_at', now()->toDateString())->first()->id,
+            ]);
+        } else {
+            $entry = $this->user->entries()->create([
+                'text' => $request->text,
+                'location' => $request->location,
+                'emotion' => $request->emotion,
+                'mediaUrl' => $request->mediaUrl,
+                'public' => $request->public,
+            ]);
+        }
 
         $friends = $this->user->allFriends();
 
