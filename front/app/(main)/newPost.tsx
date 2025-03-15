@@ -1,4 +1,4 @@
-import Icon from '@/assets/icons'
+import { Feather } from '@expo/vector-icons'
 import Avatar from '@/components/Avatar'
 import Button from '@/components/Button'
 import Header from '@/components/Header'
@@ -108,10 +108,10 @@ const newPosts = () => {
 						<Text style={styles.addImageText}>Add an image or a video</Text>
 						<View style={styles.mediaIcons}>
 							<TouchableOpacity onPress={() => onPickFile(true)}>
-								<Icon name='image' size={30} color={theme.colors.dark} />
+								<Feather name='image' size={30} color={theme.colors.dark} />
 							</TouchableOpacity>
 							<TouchableOpacity onPress={() => onPickFile(false)}>
-								<Icon name='video' size={33} color={theme.colors.dark} />
+								<Feather name='video' size={33} color={theme.colors.dark} />
 							</TouchableOpacity>
 						</View>
 					</View>

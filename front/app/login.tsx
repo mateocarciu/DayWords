@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import { View, Text, Pressable, Alert } from 'react-native'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
-import Icon from '@/assets/icons'
+import { Feather } from '@expo/vector-icons'
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet } from 'react-native'
 import BackButton from '@/components/BackButton'
@@ -73,8 +73,8 @@ export default function login() {
 				{/* form */}
 				<View style={styles.form}>
 					<Text style={{ fontSize: hp(1.5), color: theme.colors.text }}>Please login to continue</Text>
-					<Input icon={<Icon name='mail' size={26} strokeWidth={1.6} />} placeholder='Enter your email' onChangeText={(text) => (mailRef.current = text)} />
-					<Input icon={<Icon name='lock' size={26} strokeWidth={1.6} />} placeholder='Enter your password' onChangeText={(text) => (passwordRef.current = text)} />
+					<Input icon={<Feather name='mail' size={25} color={theme.colors.textLight} />} placeholder='Enter your email' onChangeText={(text) => (mailRef.current = text)} />
+					<Input icon={<Feather name='lock' size={25} color={theme.colors.textLight} />} placeholder='Enter your password' onChangeText={(text) => (passwordRef.current = text)} />
 					<Text style={styles.forgotPassword}>Forgot Password?</Text>
 					<Button title='Login' loading={loading} onPress={onSubmit} />
 					<View style={styles.footer}>

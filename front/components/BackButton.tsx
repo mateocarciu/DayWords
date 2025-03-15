@@ -1,4 +1,4 @@
-import Icon from '@/assets/icons'
+import { Feather } from '@expo/vector-icons'
 import { theme } from '@/constants/theme'
 import React from 'react'
 import { Pressable, StyleSheet } from 'react-native'
@@ -8,10 +8,10 @@ interface BackButtonProps {
 	onPress?: () => void
 }
 
-const BackButton: React.FC<BackButtonProps> = ({ size = 26, onPress = () => {} }) => {
+const BackButton: React.FC<BackButtonProps> = ({ size = 25, onPress = () => {} }) => {
 	return (
 		<Pressable onPress={onPress} style={styles.button}>
-			<Icon name='arrowLeft' strokeWidth={2} size={size} color={theme.colors.text} />
+			<Feather name='chevron-left' strokeWidth={2} size={size} color={theme.colors.text} />
 		</Pressable>
 	)
 }

@@ -1,4 +1,4 @@
-import Icon from '@/assets/icons'
+import { Feather } from '@expo/vector-icons'
 import Avatar from '@/components/Avatar'
 import Header from '@/components/Header'
 import ScreenWrapper from '@/components/ScreenWrapper'
@@ -6,10 +6,9 @@ import { theme } from '@/constants/theme'
 import { useAuth } from '@/contexts/AuthContext'
 import { hp, wp } from '@/helpers/common'
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import authFetch from '@/helpers/authFetch'
-import { User } from '@/utils/types'
 
 const Profile = () => {
 	const router = useRouter()
@@ -58,7 +57,7 @@ const Profile = () => {
 			<View style={styles.headerContainer}>
 				<Header title='Profile' marginBottom={30} />
 				<TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-					<Icon name='logout' color={theme.colors.rose} strokeWidth={2} />
+					<Feather name='power' color={theme.colors.rose} size={25} />
 				</TouchableOpacity>
 			</View>
 			<View style={styles.container}>
@@ -73,15 +72,15 @@ const Profile = () => {
 
 					<View style={{ gap: 10 }}>
 						<View style={styles.info}>
-							<Icon name='user' size={20} color={theme.colors.textLight} />
+							<Feather name='user' size={20} color={theme.colors.textLight} />
 							<Text style={styles.infoText}>{user?.name}</Text>
 						</View>
 						<View style={styles.info}>
-							<Icon name='mail' size={20} color={theme.colors.textLight} />
+							<Feather name='mail' size={20} color={theme.colors.textLight} />
 							<Text style={styles.infoText}>{user?.email || ''}</Text>
 						</View>
 						<View style={styles.info}>
-							<Icon name='info' size={20} color={theme.colors.textLight} />
+							<Feather name='info' size={20} color={theme.colors.textLight} />
 							<Text style={styles.infoText}>{user?.bio}</Text>
 						</View>
 					</View>

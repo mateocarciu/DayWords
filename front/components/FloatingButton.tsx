@@ -1,7 +1,8 @@
 import React, { useRef } from 'react'
 import { Animated, Pressable, StyleSheet } from 'react-native'
 import { hp, wp } from '@/helpers/common'
-import Icon from '@/assets/icons'
+import { Feather } from '@expo/vector-icons'
+import AntDesign from '@expo/vector-icons/AntDesign'
 import { theme } from '@/constants/theme'
 
 interface FloatingButtonProps {
@@ -29,7 +30,7 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ onPress }) => {
 	return (
 		<Animated.View style={[styles.buttonContainer, { transform: [{ scale: scaleValue }] }]}>
 			<Pressable style={styles.button} onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
-				<Icon name='edit' size={hp(3)} strokeWidth={2} color='#fff' />
+				<Feather name='edit' size={hp(3)} color='#fff' />
 			</Pressable>
 		</Animated.View>
 	)
@@ -48,8 +49,8 @@ const styles = StyleSheet.create({
 		elevation: 5
 	},
 	button: {
-		width: hp(6),
-		height: hp(6),
+		width: hp(6.5),
+		height: hp(6.5),
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderRadius: 50

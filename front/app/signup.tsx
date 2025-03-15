@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import { View, Text, Pressable, Alert } from 'react-native'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
-import Icon from '@/assets/icons'
+import { Feather } from '@expo/vector-icons'
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet } from 'react-native'
 import BackButton from '@/components/BackButton'
@@ -71,9 +71,9 @@ export default function signUp() {
 				{/* form */}
 				<View style={styles.form}>
 					<Text style={{ fontSize: hp(1.5), color: theme.colors.text }}>Please fill the details to create an account</Text>
-					<Input icon={<Icon name='user' size={26} strokeWidth={1.6} />} placeholder='Enter your username' onChangeText={(text) => (nameRef.current = text)} />
-					<Input icon={<Icon name='mail' size={26} strokeWidth={1.6} />} placeholder='Enter your email' onChangeText={(text) => (mailRef.current = text)} />
-					<Input icon={<Icon name='lock' size={26} strokeWidth={1.6} />} placeholder='Enter your password' onChangeText={(text) => (passwordRef.current = text)} />
+					<Input icon={<Feather name='user' size={25} color={theme.colors.textLight} />} placeholder='Enter your username' onChangeText={(text) => (nameRef.current = text)} />
+					<Input icon={<Feather name='mail' size={25} color={theme.colors.textLight} />} placeholder='Enter your email' onChangeText={(text) => (mailRef.current = text)} />
+					<Input icon={<Feather name='lock' size={25} color={theme.colors.textLight} />} placeholder='Enter your password' onChangeText={(text) => (passwordRef.current = text)} />
 					<Button title='Sign Up' loading={loading} onPress={onSubmit} />
 					<View style={styles.footer}>
 						<Text style={styles.footerText}>Already have an account!</Text>

@@ -1,4 +1,4 @@
-import Icon from '@/assets/icons'
+import { Feather } from '@expo/vector-icons'
 import Avatar from '@/components/Avatar'
 import FloatingButton from '@/components/FloatingButton'
 import ScreenWrapper from '@/components/ScreenWrapper'
@@ -17,6 +17,7 @@ const home = () => {
 	const authContext = useAuth()
 	const router = useRouter()
 	const [entries, setEntries] = useState<Entry[]>([])
+	const [isRefreshing, setRefreshing] = useState(false)
 
 	if (!authContext) {
 		console.error('AuthContext is not found')
@@ -25,17 +26,13 @@ const home = () => {
 	const { user } = authContext
 
 	useEffect(() => {
-		refresh()
-	}, [])
-
-	const refresh = useCallback(async () => {
-		await fetchEntries()
+		fetchEntries()
 	}, [])
 
 	useSSE({
 		userId: user?.id,
 		onNewEntry: () => {
-			refresh()
+			fetchEntries()
 		}
 	})
 
@@ -44,7 +41,14 @@ const home = () => {
 			const response = await authFetch(`${process.env.EXPO_PUBLIC_API_URL}/api/entries`, {
 				method: 'GET'
 			})
-			setEntries(response)
+
+			setRefreshing(true)
+
+			setTimeout(() => {
+				setEntries(response)
+				setRefreshing(false)
+			}, 1000)
+
 			// console.log('Entries:', response)
 		} catch (error: any) {
 			console.error('Error fetching entries', error)
@@ -58,9 +62,9 @@ const home = () => {
 				<FloatingButton onPress={() => router.push('/newPost')} />
 				<View style={styles.header}>
 					<Pressable>
-						<Icon name='friends' size={hp(4.3)} strokeWidth={1.5} color={theme.colors.text} />
+						<Feather name='users' size={25} color={theme.colors.text} />
 					</Pressable>
-					<Text style={styles.title} onPress={refresh}>
+					<Text style={styles.title} onPress={fetchEntries}>
 						DayWords
 					</Text>
 					<View style={styles.icons}>
@@ -69,7 +73,7 @@ const home = () => {
 						</Pressable>
 					</View>
 				</View>
-				<View style={{ flex: 1 }}>{user && <EntryList entries={entries} currentUserId={user.id} isRefreshing={false} onRefresh={refresh} />}</View>
+				{user && <EntryList entries={entries} currentUserId={user.id} isRefreshing={isRefreshing} onRefresh={fetchEntries} />}
 			</View>
 		</ScreenWrapper>
 	)
