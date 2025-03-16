@@ -9,15 +9,16 @@ interface HeaderProps {
 	title: string
 	showBackButton?: boolean
 	marginBottom?: number
+	reverse?: boolean
 }
 
-const Header: React.FC<HeaderProps> = ({ title = 'Screen', showBackButton = true, marginBottom = 10 }) => {
+const Header: React.FC<HeaderProps> = ({ title = 'Screen', showBackButton = true, marginBottom = 10, reverse = false }) => {
 	const router = useRouter()
 	return (
-		<View style={[styles.container, { marginBottom: marginBottom }]}>
+		<View style={[styles.container, { marginBottom: marginBottom, flexDirection: reverse ? 'row-reverse' : 'row' }]}>
 			{showBackButton && (
-				<View style={styles.backButton}>
-					<BackButton onPress={() => router.back()} />
+				<View style={[styles.backButton, reverse && styles.backButtonReverse]}>
+					<BackButton onPress={() => router.back()} reverse={reverse} />
 				</View>
 			)}
 			<Text style={styles.title}>{title}</Text>
@@ -38,6 +39,10 @@ const styles = StyleSheet.create({
 	backButton: {
 		position: 'absolute',
 		left: 0
+	},
+	backButtonReverse: {
+		left: 'auto',
+		right: 0
 	},
 	title: {
 		fontSize: hp(2.7),

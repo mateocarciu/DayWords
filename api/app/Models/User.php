@@ -26,6 +26,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'pivot'
     ];
 
     public function entries(): HasMany
@@ -35,8 +36,7 @@ class User extends Authenticatable
 
     public function friends(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')
-            ->withTimestamps();
+        return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id');
     }
 
     public function allFriends()

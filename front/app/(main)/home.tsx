@@ -6,8 +6,8 @@ import { theme } from '@/constants/theme'
 import { useAuth } from '@/contexts/AuthContext'
 import { hp, wp } from '@/helpers/common'
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState, useCallback } from 'react'
-import { View, Text, StyleSheet, Alert, Pressable } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native'
 import { Entry } from '@/utils/types'
 import authFetch from '@/helpers/authFetch'
 import EntryList from '@/components/entry/EntryList'
@@ -61,16 +61,16 @@ const home = () => {
 			<View style={styles.container}>
 				<FloatingButton onPress={() => router.push('/newPost')} />
 				<View style={styles.header}>
-					<Pressable>
+					<TouchableOpacity onPress={() => router.push('/friends')}>
 						<Feather name='users' size={25} color={theme.colors.text} />
-					</Pressable>
+					</TouchableOpacity>
 					<Text style={styles.title} onPress={fetchEntries}>
 						DayWords
 					</Text>
 					<View style={styles.icons}>
-						<Pressable onPress={() => router.push('/profile')}>
+						<TouchableOpacity onPress={() => router.push('/profile')}>
 							<Avatar username={user?.username || ''} size={hp(4.3)} rounded={theme.radius.sm} style={{ borderWidth: 2 }} />
-						</Pressable>
+						</TouchableOpacity>
 					</View>
 				</View>
 				{user && <EntryList entries={entries} currentUserId={user.id} isRefreshing={isRefreshing} onRefresh={fetchEntries} />}

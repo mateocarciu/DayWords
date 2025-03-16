@@ -12,6 +12,8 @@ export const theme = {
     roseLight: "#f87171",
     light: "#ffffff",
     lightDark: "#f5f5f5",
+    green: "#34D399",
+    greenLight: "#6EE7B7",
   },
   fonts: {
     medium: "500" as const,

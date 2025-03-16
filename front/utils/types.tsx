@@ -25,3 +25,14 @@ export interface Entry {
 	more_entries: number
 	user: User
 }
+
+export interface FriendRequests {
+	id: number
+	sender_id: number
+	receiver_id: number
+	status: string
+	date: string
+	created_at: string
+	updated_at: string
+	sender: User
+}

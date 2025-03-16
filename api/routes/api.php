@@ -22,8 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('/friends', FriendController::class);
     Route::post('/friends/add', [FriendController::class, 'store']);
-    Route::get('/friend-requests', [FriendController::class, 'friendRequests']);
-    Route::patch('/friend-requests/{id}', [FriendController::class, 'handleFriendRequest']);
+    Route::patch('/friends/requests/{id}', [FriendController::class, 'handleFriendRequest']);
 
     Route::apiResource('/entries', EntryController::class);
 

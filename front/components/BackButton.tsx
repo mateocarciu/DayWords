@@ -1,18 +1,19 @@
 import { Feather } from '@expo/vector-icons'
 import { theme } from '@/constants/theme'
 import React from 'react'
-import { Pressable, StyleSheet } from 'react-native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 
 interface BackButtonProps {
 	size?: number
 	onPress?: () => void
+	reverse?: boolean
 }
 
-const BackButton: React.FC<BackButtonProps> = ({ size = 25, onPress = () => {} }) => {
+const BackButton: React.FC<BackButtonProps> = ({ size = 25, onPress = () => {}, reverse = false }) => {
 	return (
-		<Pressable onPress={onPress} style={styles.button}>
-			<Feather name='chevron-left' strokeWidth={2} size={size} color={theme.colors.text} />
-		</Pressable>
+		<TouchableOpacity onPress={onPress} style={styles.button}>
+			<Feather name={reverse ? 'chevron-right' : 'chevron-left'} strokeWidth={2} size={size} color={theme.colors.text} />
+		</TouchableOpacity>
 	)
 }
 

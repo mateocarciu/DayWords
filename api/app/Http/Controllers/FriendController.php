@@ -19,7 +19,16 @@ class FriendController extends Controller
     public function index()
     {
         $friends = $this->user->allFriends();
-        return response()->json($friends);
+
+        $friendRequests = FriendRequest::where('receiver_id', $this->user->id)
+            ->where('status', 'PENDING')
+            ->with('sender')
+            ->get();
+
+        return response()->json([
+            'friends' => $friends,
+            'requests' => $friendRequests,
+        ]);
     }
 
     public function show($id)
@@ -87,15 +96,6 @@ class FriendController extends Controller
         }
     }
 
-    public function friendRequests()
-    {
-        $requests = FriendRequest::where('receiver_id', $this->user->id)
-            ->where('status', 'PENDING')
-            ->with('sender')
-            ->get();
-
-        return response()->json($requests);
-    }
     public function handleFriendRequest(Request $request, $id)
     {
         $friendRequest = FriendRequest::findOrFail($id);
