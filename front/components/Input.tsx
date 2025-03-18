@@ -1,17 +1,17 @@
 import { theme } from '@/constants/theme'
 import { hp } from '@/helpers/common'
-import React from 'react'
-import { View, StyleSheet, StyleProp, ViewStyle, TextInput, TextInputProps } from 'react-native'
+import { View, StyleSheet, TextInput, TextInputProps } from 'react-native'
 
 interface InputProps extends TextInputProps {
-	containerStyle?: StyleProp<ViewStyle>
 	icon?: React.ReactNode
 	inputRef?: React.Ref<TextInput>
+	height?: number
+	borderWidth?: number
 }
 
-const Input: React.FC<InputProps> = ({ containerStyle, icon, inputRef, ...props }) => {
+const Input: React.FC<InputProps> = ({ height = hp(7.2), borderWidth = 0.4, icon, inputRef, ...props }) => {
 	return (
-		<View style={[styles.container, containerStyle && containerStyle]}>
+		<View style={[styles.container, { height, borderWidth }]}>
 			{icon && icon}
 			<TextInput ref={inputRef && inputRef} style={{ flex: 1 }} placeholderTextColor={theme.colors.textLight} {...props} />
 		</View>
@@ -23,10 +23,8 @@ export default Input
 const styles = StyleSheet.create({
 	container: {
 		flexDirection: 'row',
-		height: hp(7.2),
 		alignItems: 'center',
 		justifyContent: 'center',
-		borderWidth: 0.4,
 		borderColor: theme.colors.text,
 		borderRadius: theme.radius.sm,
 		paddingHorizontal: 18,

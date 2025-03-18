@@ -57,7 +57,7 @@ const home = () => {
 	}
 
 	return (
-		<ScreenWrapper autoDismissKeyboard={false} scrollEnabled={true}>
+		<ScreenWrapper scrollEnabled={true}>
 			<View style={styles.container}>
 				<FloatingButton onPress={() => router.push('/newPost')} />
 				<View style={styles.header}>

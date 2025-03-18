@@ -12,19 +12,18 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
+    //logout
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-
+    //friends page
     Route::get('/users/search', [FriendController::class, 'searchUsers']);
-
     Route::apiResource('/friends', FriendController::class);
-    Route::post('/friends/add', [FriendController::class, 'store']);
+    Route::post('/friends/add/{id}', [FriendController::class, 'store']);
     Route::patch('/friends/requests/{id}', [FriendController::class, 'handleFriendRequest']);
 
+    //entries page
     Route::apiResource('/entries', EntryController::class);
 
-    Route::post('/comments/{entryId}', [CommentController::class, 'store']);
+    //entries detail page
+    Route::post('/entry/{id}/comments', [CommentController::class, 'store']);
 });

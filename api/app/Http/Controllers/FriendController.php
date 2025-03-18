@@ -44,11 +44,9 @@ class FriendController extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function store($id)
     {
-        $friendUsername = $request->input('username');
-
-        $friend = User::where('username', $friendUsername)->first();
+        $friend = $this->user->find($id);
 
         if (!$friend) {
             return response()->json(['message' => 'User not found'], 404);
@@ -130,14 +128,13 @@ class FriendController extends Controller
 
     public function searchUsers(Request $request)
     {
-        $searchTerm = $request->query('searchTerm'); // Utilise query() pour récupérer les paramètres GET de la requête
-
-        if (!$searchTerm) {
-            return response()->json(['message' => 'Search term is required'], 400);
-        }
+        //todo : envoyer le statut de la demande d'ami pas juste is friend
+        $request->validate([
+            'searchTerm' => 'required|string',
+        ]);
 
         // Rechercher les utilisateurs correspondant au terme de recherche qui est envoyé
-        $users = User::where('username', 'LIKE', '%' . $searchTerm . '%')
+        $users = User::where('username', 'LIKE', '%' . $request->searchTerm . '%')
             ->where('id', '!=', $this->user->id) // Exclure l'utilisateur connecté
             ->get()
             ->map(function ($searchedUser) {
