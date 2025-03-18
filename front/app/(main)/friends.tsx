@@ -10,11 +10,13 @@ import Tabs from '@/components/Tabs'
 import TabButton from '@/components/TabButton'
 import { Feather } from '@expo/vector-icons'
 import { User, FriendRequests } from '@/utils/types'
+import Input from '@/components/Input'
 
 const Friends = () => {
 	const [friends, setFriends] = useState<User[]>([])
 	const [friendRequests, setFriendRequests] = useState<FriendRequests[]>([])
 	const [activeTab, setActiveTab] = useState<'friends' | 'requests'>('friends')
+	const [searchUsername, setSearchUsername] = useState('')
 
 	useEffect(() => {
 		fetchFriends()
@@ -68,6 +70,18 @@ const Friends = () => {
 		])
 	}
 
+	const searchUsers = async (username: String) => {
+		try {
+			const response = await authFetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users/search?searchTerm=${username}`, {
+				method: 'GET'
+			})
+			setSearchUsername(response)
+			console.log('Search results:', searchUsername)
+		} catch (error) {
+			console.error('Error searching users:', error)
+		}
+	}
+
 	const renderFriendItem = ({ item }: { item: User }) => (
 		<View style={styles.card}>
 			<View style={styles.userInfo}>
@@ -105,15 +119,16 @@ const Friends = () => {
 
 	return (
 		<ScreenWrapper autoDismissKeyboard={false}>
-			<View style={styles.headerContainer}>
-				<Header title='Friends' marginBottom={30} reverse={true} />
-			</View>
-			<Tabs>
-				<TabButton title='Friends' active={activeTab === 'friends'} onPress={() => setActiveTab('friends')} />
-				<TabButton title={`Requests (${friendRequests.length})`} active={activeTab === 'requests'} onPress={() => setActiveTab('requests')} />
-			</Tabs>
-
 			<View style={styles.container}>
+				<View style={styles.tabsContainer}>
+					<Header title='Friends' marginBottom={30} reverse={true} />
+					<Input icon={<Feather name='search' size={25} color={theme.colors.textLight} />} placeholder='Search for a user...' onChangeText={(text) => searchUsers(text)} />
+				</View>
+				<Tabs>
+					<TabButton title='Friends' active={activeTab === 'friends'} onPress={() => setActiveTab('friends')} />
+					<TabButton title={`Requests (${friendRequests.length})`} active={activeTab === 'requests'} onPress={() => setActiveTab('requests')} />
+				</Tabs>
+
 				{activeTab === 'friends' ? (
 					<FlatList
 						data={friends}
@@ -145,13 +160,12 @@ const Friends = () => {
 export default Friends
 
 const styles = StyleSheet.create({
-	headerContainer: {
-		marginBottom: 20,
-		paddingHorizontal: wp(4)
-	},
 	container: {
 		flex: 1,
 		paddingHorizontal: wp(4)
+	},
+	tabsContainer: {
+		marginBottom: 20
 	},
 	card: {
 		backgroundColor: theme.colors.light,

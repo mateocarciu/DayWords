@@ -12,7 +12,6 @@ const Tabs = ({ children }: TabsProps) => {
 const styles = StyleSheet.create({
 	container: {
 		flexDirection: 'row',
-		paddingHorizontal: 16,
 		marginBottom: 20
 	}
 })
