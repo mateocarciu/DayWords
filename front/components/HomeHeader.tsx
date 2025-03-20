@@ -28,11 +28,9 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ reverse = false }) => {
 
 			<Text style={styles.title}>DayWords</Text>
 
-			<View style={styles.icons}>
-				<TouchableOpacity onPress={() => router.push('/profile')}>
-					<Avatar username={user?.username || ''} size={hp(4.3)} rounded={theme.radius.sm} style={{ borderWidth: 2 }} />
-				</TouchableOpacity>
-			</View>
+			<TouchableOpacity onPress={() => router.push('/profile')}>
+				<Avatar username={user?.username || ''} size={hp(4.3)} rounded={theme.radius.sm} style={{ borderWidth: 2 }} />
+			</TouchableOpacity>
 		</View>
 	)
 }
@@ -47,9 +45,14 @@ const styles = StyleSheet.create({
 		marginBottom: 10
 	},
 	title: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		textAlign: 'center',
 		color: theme.colors.text,
 		fontSize: hp(3.2),
-		fontWeight: theme.fonts.bold
+		fontWeight: theme.fonts.bold,
+		pointerEvents: 'none'
 	},
 	avatarImage: {
 		height: hp(4.3),
@@ -57,11 +60,5 @@ const styles = StyleSheet.create({
 		borderRadius: theme.radius.sm,
 		borderColor: theme.colors.gray,
 		borderWidth: 3
-	},
-	icons: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-		gap: 18
 	}
 })
