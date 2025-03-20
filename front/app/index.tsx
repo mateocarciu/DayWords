@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { hp, wp } from '@/helpers/common'
 import { theme } from '@/constants/theme'
-import Button from '@/components/Button'
+import Button from '@/components/buttons/Button'
 
 export default function index() {
 	const router = useRouter()

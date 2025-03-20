@@ -1,4 +1,4 @@
-import FloatingButton from '@/components/FloatingButton'
+import FloatingButton from '@/components/buttons/FloatingButton'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { useRouter } from 'expo-router'
 import EntryList from '@/components/entry/EntryList'

@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import BackButton from './BackButton'
+import BackButton from './buttons/BackButton'
 import { hp } from '@/helpers/common'
 import { theme } from '@/constants/theme'
 

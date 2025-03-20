@@ -2,7 +2,7 @@ import { theme } from '@/constants/theme'
 import { hp } from '@/helpers/common'
 import React, { useRef } from 'react'
 import { View, Text, StyleProp, ViewStyle, TextStyle, Pressable, StyleSheet, Animated } from 'react-native'
-import Loading from './Loading'
+import Loading from '../Loading'
 
 interface ButtonProps {
 	buttonStyle?: StyleProp<ViewStyle>

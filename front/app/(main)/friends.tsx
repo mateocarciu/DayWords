@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, Alert, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Alert, FlatList } from 'react-native'
 import { theme } from '@/constants/theme'
 import { hp, wp } from '@/helpers/common'
 import Header from '@/components/Header'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import authFetch from '@/helpers/authFetch'
 import Tabs from '@/components/Tabs'
-import TabButton from '@/components/TabButton'
+import TabButton from '@/components/buttons/TabButton'
 import { Feather } from '@expo/vector-icons'
 import { User, FriendRequests } from '@/utils/types'
-import Input from '@/components/Input'
+import Input from '@/components/inputs/Input'
 import UserCard from '@/components/UserCard'
 
 const Friends = () => {
