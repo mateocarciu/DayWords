@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Alert, FlatList, TouchableOpacity } from 'react
 import { theme } from '@/constants/theme'
 import { hp, wp } from '@/helpers/common'
 import Header from '@/components/Header'
-import Avatar from '@/components/Avatar'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import authFetch from '@/helpers/authFetch'
 import Tabs from '@/components/Tabs'
@@ -111,56 +110,54 @@ const Friends = () => {
 
 	return (
 		<ScreenWrapper>
-			<View style={styles.container}>
-				<View style={styles.tabsContainer}>
-					<Header title='Friends' marginBottom={30} reverse={true} />
+			<View style={styles.tabsContainer}>
+				<Header title='Friends' marginBottom={30} reverse={true} />
 
-					<Input height={hp(5)} icon={<Feather name='search' size={25} color={theme.colors.textLight} />} placeholder='Search for a user...' onChangeText={(text) => searchUsers(text)} value={searchUsername} />
-				</View>
-
-				{searchUsername.length > 0 ? (
-					<FlatList
-						data={searchResults}
-						keyExtractor={(item) => item.id.toString()}
-						renderItem={renderSearchResultItem}
-						contentContainerStyle={{
-							gap: hp(1.5),
-							paddingBottom: hp(2)
-						}}
-					/>
-				) : (
-					<>
-						<Tabs>
-							<TabButton title='Friends' active={activeTab === 'friends'} onPress={() => setActiveTab('friends')} />
-							<TabButton title={`Requests (${friendRequests.length})`} active={activeTab === 'requests'} onPress={() => setActiveTab('requests')} />
-						</Tabs>
-
-						{activeTab === 'friends' ? (
-							<FlatList
-								data={friends}
-								keyExtractor={(item) => item.id.toString()}
-								renderItem={renderFriendItem}
-								contentContainerStyle={{
-									gap: hp(1.5),
-									paddingBottom: hp(2)
-								}}
-								ListEmptyComponent={<Text style={styles.emptyText}>Aucun ami pour l'instant.</Text>}
-							/>
-						) : (
-							<FlatList
-								data={friendRequests}
-								keyExtractor={(item) => item.id.toString()}
-								renderItem={renderRequestItem}
-								contentContainerStyle={{
-									gap: hp(1.5),
-									paddingBottom: hp(2)
-								}}
-								ListEmptyComponent={<Text style={styles.emptyText}>Aucune demande d'ami en attente.</Text>}
-							/>
-						)}
-					</>
-				)}
+				<Input height={hp(5)} icon={<Feather name='search' size={25} color={theme.colors.textLight} />} placeholder='Search for a user...' onChangeText={(text) => searchUsers(text)} value={searchUsername} />
 			</View>
+
+			{searchUsername.length > 0 ? (
+				<FlatList
+					data={searchResults}
+					keyExtractor={(item) => item.id.toString()}
+					renderItem={renderSearchResultItem}
+					contentContainerStyle={{
+						gap: hp(1.5),
+						paddingBottom: hp(2)
+					}}
+				/>
+			) : (
+				<>
+					<Tabs>
+						<TabButton title='Friends' active={activeTab === 'friends'} onPress={() => setActiveTab('friends')} />
+						<TabButton title={`Requests (${friendRequests.length})`} active={activeTab === 'requests'} onPress={() => setActiveTab('requests')} />
+					</Tabs>
+
+					{activeTab === 'friends' ? (
+						<FlatList
+							data={friends}
+							keyExtractor={(item) => item.id.toString()}
+							renderItem={renderFriendItem}
+							contentContainerStyle={{
+								gap: hp(1.5),
+								paddingBottom: hp(2)
+							}}
+							ListEmptyComponent={<Text style={styles.emptyText}>Aucun ami pour l'instant.</Text>}
+						/>
+					) : (
+						<FlatList
+							data={friendRequests}
+							keyExtractor={(item) => item.id.toString()}
+							renderItem={renderRequestItem}
+							contentContainerStyle={{
+								gap: hp(1.5),
+								paddingBottom: hp(2)
+							}}
+							ListEmptyComponent={<Text style={styles.emptyText}>Aucune demande d'ami en attente.</Text>}
+						/>
+					)}
+				</>
+			)}
 		</ScreenWrapper>
 	)
 }
@@ -168,10 +165,6 @@ const Friends = () => {
 export default Friends
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		paddingHorizontal: wp(4)
-	},
 	tabsContainer: {
 		marginBottom: 20
 	},

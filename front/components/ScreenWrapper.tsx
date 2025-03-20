@@ -2,6 +2,7 @@ import React from 'react'
 import { Keyboard, StatusBar, TouchableWithoutFeedback, View, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Constants from 'expo-constants'
+import { wp } from '@/helpers/common'
 
 interface ScreenWrapperProps {
 	children: React.ReactNode
@@ -18,16 +19,16 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({ children, bg = 'white', a
 
 	// Si le scroll est activé, ne pas utiliser TouchableWithoutFeedback
 	const content = scrollEnabled ? (
-		<View style={{ flex: 1 }}>{children}</View>
+		<View style={{ flex: 1, marginHorizontal: wp(4) }}>{children}</View>
 	) : (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss} disabled={!autoDismissKeyboard}>
-			<View style={{ flex: 1 }}>{children}</View>
+			<View style={{ flex: 1, marginHorizontal: wp(4) }}>{children}</View>
 		</TouchableWithoutFeedback>
 	)
 
 	if (Platform.OS === 'android') {
 		return (
-			<View style={{ flex: 1, paddingTop: StatusBarHeight, backgroundColor: bg }}>
+			<View style={{ flex: 1, paddingTop: StatusBarHeight, backgroundColor: bg, marginHorizontal: wp(4) }}>
 				<StatusBar barStyle='dark-content' hidden={false} networkActivityIndicatorVisible={true} />
 				{content}
 			</View>

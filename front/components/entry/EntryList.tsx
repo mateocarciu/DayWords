@@ -1,16 +1,13 @@
 import React from 'react'
-import { FlatList, StyleSheet, View, Text, RefreshControl } from 'react-native'
+import { FlatList, StyleSheet, View, Text, RefreshControl, ActivityIndicator } from 'react-native'
 import { hp } from '@/helpers/common'
 import { Entry, User } from '@/utils/types'
 import EntryListItem from './EntryListItem'
 import { Feather } from '@expo/vector-icons'
+import useEntries from '@/hooks/useEntries'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface EntryListProps {
-	entries: Entry[]
-	currentUserId: number
-	onRefresh: () => void
-	isRefreshing: boolean
-	refreshControl?: React.ReactElement
 	onLikeEntry?: (entryId: number) => void
 	onReplyEntry?: (parentEntry: Entry) => void
 	onDeleteEntry?: (entryId: number) => void
@@ -19,8 +16,25 @@ interface EntryListProps {
 	onUserPress?: (user: User) => void
 }
 
-const EntryList: React.FC<EntryListProps> = ({ entries, currentUserId, onRefresh, isRefreshing, onLikeEntry, onReplyEntry, onDeleteEntry, onShareEntry, onEditEntry, onUserPress }) => {
-	const renderItem = ({ item }: { item: Entry }) => <EntryListItem entry={item} currentUserId={currentUserId} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onDeleteEntry={onDeleteEntry} onShareEntry={onShareEntry} onEditEntry={onEditEntry} onUserPress={onUserPress} />
+const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDeleteEntry, onShareEntry, onEditEntry, onUserPress }) => {
+	const authContext = useAuth()
+
+	if (!authContext) {
+		console.error('AuthContext is not found')
+		return null
+	}
+	const { user } = authContext
+	const { entries, isLoading, isRefreshing, fetchEntries } = useEntries(user?.id)
+
+	const renderItem = ({ item }: { item: Entry }) => <EntryListItem entry={item} currentUserId={user?.id ?? 0} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onDeleteEntry={onDeleteEntry} onShareEntry={onShareEntry} onEditEntry={onEditEntry} onUserPress={onUserPress} />
+
+	if (isLoading) {
+		return (
+			<View style={styles.loaderContainer}>
+				<ActivityIndicator size='large' color='gray' />
+			</View>
+		)
+	}
 
 	if (entries.length === 0) {
 		return (
@@ -30,8 +44,7 @@ const EntryList: React.FC<EntryListProps> = ({ entries, currentUserId, onRefresh
 				keyExtractor={() => 'key'}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={styles.emptyContainer}
-				onRefresh={onRefresh}
-				refreshing={isRefreshing}
+				refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={fetchEntries} />}
 				ListEmptyComponent={
 					<View style={styles.emptyContent}>
 						<Feather name='clock' size={40} color='gray' />
@@ -42,7 +55,7 @@ const EntryList: React.FC<EntryListProps> = ({ entries, currentUserId, onRefresh
 		)
 	}
 
-	return <FlatList data={entries} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent} onRefresh={onRefresh} refreshing={isRefreshing} />
+	return <FlatList data={entries} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={fetchEntries} />} />
 }
 
 const styles = StyleSheet.create({
@@ -62,6 +75,11 @@ const styles = StyleSheet.create({
 		marginTop: 10,
 		fontSize: 16,
 		color: 'gray'
+	},
+	loaderContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center'
 	}
 })
 

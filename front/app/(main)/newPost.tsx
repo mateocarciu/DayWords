@@ -6,7 +6,7 @@ import RichTextEditor from '@/components/RichTextEditor'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
 import { useAuth } from '@/contexts/AuthContext'
-import { hp, wp } from '@/helpers/common'
+import { hp } from '@/helpers/common'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useRef, useState } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Keyboard } from 'react-native'
@@ -90,37 +90,35 @@ const newPosts = () => {
 
 	return (
 		<ScreenWrapper autoDismissKeyboard={false}>
-			<View style={styles.container}>
-				<Header title='Create a new post' />
-				<ScrollView contentContainerStyle={{ gap: 20 }} showsVerticalScrollIndicator={false}>
-					<View style={styles.header}>
-						<Avatar username={user?.username ?? ''} size={hp(6.5)} rounded={theme.radius.xl} />
-						<View style={{ gap: 2 }}>
-							<Text style={styles.username}>{user && user?.username}</Text>
-							<Text style={styles.location}>{user?.location}</Text>
-						</View>
+			<Header title='Create a new post' />
+			<ScrollView contentContainerStyle={{ gap: 20, marginTop: 30 }} showsVerticalScrollIndicator={false}>
+				<View style={styles.header}>
+					<Avatar username={user?.username ?? ''} size={hp(6.5)} rounded={theme.radius.xl} />
+					<View style={{ gap: 2 }}>
+						<Text style={styles.username}>{user && user?.username}</Text>
+						<Text style={styles.location}>{user?.location}</Text>
 					</View>
+				</View>
 
-					<View style={styles.textEditor}>
-						<RichTextEditor editorRef={editorRef} onChange={(body) => (text.current = body)} />
+				<View style={styles.textEditor}>
+					<RichTextEditor editorRef={editorRef} onChange={(body) => (text.current = body)} />
+				</View>
+				<View style={styles.media}>
+					<Text style={styles.addImageText}>Add an image or a video</Text>
+					<View style={styles.mediaIcons}>
+						<TouchableOpacity onPress={() => onPickFile(true)}>
+							<Feather name='image' size={30} color={theme.colors.dark} />
+						</TouchableOpacity>
+						<TouchableOpacity onPress={() => onPickFile(false)}>
+							<Feather name='video' size={33} color={theme.colors.dark} />
+						</TouchableOpacity>
 					</View>
-					<View style={styles.media}>
-						<Text style={styles.addImageText}>Add an image or a video</Text>
-						<View style={styles.mediaIcons}>
-							<TouchableOpacity onPress={() => onPickFile(true)}>
-								<Feather name='image' size={30} color={theme.colors.dark} />
-							</TouchableOpacity>
-							<TouchableOpacity onPress={() => onPickFile(false)}>
-								<Feather name='video' size={33} color={theme.colors.dark} />
-							</TouchableOpacity>
-						</View>
-					</View>
+				</View>
 
-					<Button buttonStyle={{ height: hp(6.2) }} title='Post' loading={loading} hasShadow={false} onPress={onSubmit} />
+				<Button buttonStyle={{ height: hp(6.2) }} title='Post' loading={loading} hasShadow={false} onPress={onSubmit} />
 
-					{isKeyboardShow && <View style={{ height: hp(35) }}></View>}
-				</ScrollView>
-			</View>
+				{isKeyboardShow && <View style={{ height: hp(35) }}></View>}
+			</ScrollView>
 		</ScreenWrapper>
 	)
 }
@@ -128,12 +126,6 @@ const newPosts = () => {
 export default newPosts
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		marginBottom: 30,
-		paddingHorizontal: wp(4),
-		gap: 15
-	},
 	title: {
 		marginBottom: 10,
 		fontSize: hp(2.5),

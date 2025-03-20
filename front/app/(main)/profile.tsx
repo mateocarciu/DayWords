@@ -4,7 +4,7 @@ import Header from '@/components/Header'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { theme } from '@/constants/theme'
 import { useAuth } from '@/contexts/AuthContext'
-import { hp, wp } from '@/helpers/common'
+import { hp } from '@/helpers/common'
 import { useRouter } from 'expo-router'
 import React, { useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
@@ -60,29 +60,27 @@ const Profile = () => {
 					<Feather name='power' color={theme.colors.rose} size={25} />
 				</TouchableOpacity>
 			</View>
-			<View style={styles.container}>
-				<View style={{ gap: 15 }}>
-					<View style={styles.avatarContainer}>
-						<Avatar username={user?.username ?? ''} size={hp(12)} rounded={theme.radius.xxl * 1.4} />
-					</View>
+			<View style={{ gap: 15 }}>
+				<View style={styles.avatarContainer}>
+					<Avatar username={user?.username ?? ''} size={hp(12)} rounded={theme.radius.xxl * 1.4} />
+				</View>
 
-					<View style={{ alignItems: 'center', gap: 2 }}>
-						<Text style={styles.userName}>{user?.username || ''}</Text>
-					</View>
+				<View style={{ alignItems: 'center', gap: 2 }}>
+					<Text style={styles.userName}>{user?.username || ''}</Text>
+				</View>
 
-					<View style={{ gap: 10 }}>
-						<View style={styles.info}>
-							<Feather name='user' size={20} color={theme.colors.textLight} />
-							<Text style={styles.infoText}>{user?.name}</Text>
-						</View>
-						<View style={styles.info}>
-							<Feather name='mail' size={20} color={theme.colors.textLight} />
-							<Text style={styles.infoText}>{user?.email || ''}</Text>
-						</View>
-						<View style={styles.info}>
-							<Feather name='info' size={20} color={theme.colors.textLight} />
-							<Text style={styles.infoText}>{user?.bio}</Text>
-						</View>
+				<View style={{ gap: 10 }}>
+					<View style={styles.info}>
+						<Feather name='user' size={20} color={theme.colors.textLight} />
+						<Text style={styles.infoText}>{user?.name}</Text>
+					</View>
+					<View style={styles.info}>
+						<Feather name='mail' size={20} color={theme.colors.textLight} />
+						<Text style={styles.infoText}>{user?.email || ''}</Text>
+					</View>
+					<View style={styles.info}>
+						<Feather name='info' size={20} color={theme.colors.textLight} />
+						<Text style={styles.infoText}>{user?.bio}</Text>
 					</View>
 				</View>
 			</View>
@@ -93,13 +91,8 @@ const Profile = () => {
 export default Profile
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		paddingHorizontal: wp(4)
-	},
 	headerContainer: {
-		marginBottom: 20,
-		paddingHorizontal: wp(4)
+		marginBottom: 20
 	},
 	avatarContainer: {
 		height: hp(12),
@@ -123,7 +116,7 @@ const styles = StyleSheet.create({
 	},
 	logoutBtn: {
 		position: 'absolute',
-		right: wp(4),
+		right: 0,
 		padding: 5,
 		borderRadius: theme.radius.sm,
 		backgroundColor: theme.colors.light
