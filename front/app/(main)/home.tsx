@@ -1,7 +1,7 @@
 import FloatingButton from '@/components/buttons/FloatingButton'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { useRouter } from 'expo-router'
-import EntryList from '@/components/entry/EntryList'
+import EntryList from '@/components/entries/EntryList'
 import HomeHeader from '@/components/HomeHeader'
 
 const home = () => {
