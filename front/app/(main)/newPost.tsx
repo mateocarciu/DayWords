@@ -65,7 +65,7 @@ const newPosts = () => {
 				})
 			})
 			setTimeout(() => {
-				router.replace('/home')
+				router.back()
 			}, 1000)
 		} catch (error: any) {
 			setLoading(false)

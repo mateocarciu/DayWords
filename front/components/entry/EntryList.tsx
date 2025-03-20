@@ -1,5 +1,5 @@
 import React from 'react'
-import { FlatList, StyleSheet, View, Text, RefreshControl, ActivityIndicator } from 'react-native'
+import { FlatList, StyleSheet, View, Text, RefreshControl } from 'react-native'
 import { hp } from '@/helpers/common'
 import { Entry, User } from '@/utils/types'
 import EntryListItem from './EntryListItem'
