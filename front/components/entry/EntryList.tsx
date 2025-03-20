@@ -24,17 +24,9 @@ const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDele
 		return null
 	}
 	const { user } = authContext
-	const { entries, isLoading, isRefreshing, fetchEntries } = useEntries(user?.id)
+	const { entries, isRefreshing, fetchEntries } = useEntries(user?.id)
 
 	const renderItem = ({ item }: { item: Entry }) => <EntryListItem entry={item} currentUserId={user?.id ?? 0} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onDeleteEntry={onDeleteEntry} onShareEntry={onShareEntry} onEditEntry={onEditEntry} onUserPress={onUserPress} />
-
-	if (isLoading) {
-		return (
-			<View style={styles.loaderContainer}>
-				<ActivityIndicator size='large' color='gray' />
-			</View>
-		)
-	}
 
 	if (entries.length === 0) {
 		return (

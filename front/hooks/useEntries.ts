@@ -27,7 +27,9 @@ const useEntries = (userId?: number) => {
 		} catch (error: any) {
 			console.error('Error fetching entries', error)
 		} finally {
-			setRefreshing(false)
+			setTimeout(() => {
+				setRefreshing(false)
+			}, 1000)
 		}
 	}, [userId])
 
