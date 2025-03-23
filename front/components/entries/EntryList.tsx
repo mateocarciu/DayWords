@@ -6,6 +6,7 @@ import EntryListItem from './EntryListItem'
 import { Feather } from '@expo/vector-icons'
 import useEntries from '@/hooks/useEntries'
 import { useAuth } from '@/contexts/AuthContext'
+import { Keyboard } from 'react-native'
 
 interface EntryListProps {
 	onLikeEntry?: (entryId: number) => void
@@ -47,7 +48,7 @@ const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDele
 		)
 	}
 
-	return <FlatList data={entries} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={fetchEntries} />} />
+	return <FlatList data={entries} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={fetchEntries} />} onScrollBeginDrag={Keyboard.dismiss} />
 }
 
 const styles = StyleSheet.create({
