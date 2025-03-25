@@ -25,7 +25,11 @@ const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDele
 		return null
 	}
 	const { user } = authContext
-	const { entries, isRefreshing, fetchEntries } = useEntries(user?.id)
+	const { entries, isRefreshing, fetchEntries, deleteEntry } = useEntries(user?.id)
+
+	onDeleteEntry = async (entryId: number) => {
+		await deleteEntry(entryId)
+	}
 
 	const renderItem = ({ item }: { item: Entry }) => <EntryListItem entry={item} currentUserId={user?.id ?? 0} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onDeleteEntry={onDeleteEntry} onShareEntry={onShareEntry} onEditEntry={onEditEntry} onUserPress={onUserPress} />
 

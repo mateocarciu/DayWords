@@ -33,6 +33,17 @@ const useEntries = (userId?: number) => {
 		}
 	}, [userId])
 
+	const deleteEntry = async (entryId: number) => {
+		try {
+			authFetch(`${process.env.EXPO_PUBLIC_API_URL}/api/entries/${entryId}`, {
+				method: 'DELETE'
+			})
+			fetchEntries()
+		} catch (error: any) {
+			console.error('Error deleting entry', error)
+		}
+	}
+
 	useEffect(() => {
 		if (userId) {
 			setLoading(true)
@@ -44,7 +55,8 @@ const useEntries = (userId?: number) => {
 		entries,
 		isLoading,
 		isRefreshing,
-		fetchEntries
+		fetchEntries,
+		deleteEntry
 	}
 }
 
