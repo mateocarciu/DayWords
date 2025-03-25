@@ -106,6 +106,13 @@ class EntryController extends Controller
             ]));
         }
 
+        // to notify the currennt user as well so they can see the entry in real-time instead of fetching it from the server
+        Redis::publish('user.' . $this->user->id, json_encode([
+            'entry_id' => $entry->id,
+            'title' => 'New entry created!',
+            'text' => $entry->text,
+        ]));
+
         return response()->json($entry, 201);
     }
 
