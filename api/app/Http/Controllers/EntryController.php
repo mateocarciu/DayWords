@@ -149,7 +149,20 @@ class EntryController extends Controller
 
     public function destroy($id)
     {
-        $entry = Entry::findOrFail($id)->where('user_id', $this->user->id);
+        $entry = Entry::where('id', $id)
+            ->where('user_id', $this->user->id)
+            ->firstOrFail();
+
+        $childEntries = $entry->childEntries;
+
+        if ($childEntries->isNotEmpty()) {
+            $newParent = $childEntries->first();
+            $newParent->update(['parent_entry_id' => null]);
+
+            foreach ($childEntries->where('id', '!=', $newParent->id) as $child) {
+                $child->update(['parent_entry_id' => $newParent->id]);
+            }
+        }
 
         $entry->delete();
 

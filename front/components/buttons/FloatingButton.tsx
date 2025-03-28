@@ -2,15 +2,16 @@ import React, { useRef } from 'react'
 import { Animated, Pressable, StyleSheet } from 'react-native'
 import { hp, wp } from '@/helpers/common'
 import { Feather } from '@expo/vector-icons'
-import AntDesign from '@expo/vector-icons/AntDesign'
 import { theme } from '@/constants/theme'
+import { useRouter } from 'expo-router'
 
 interface FloatingButtonProps {
-	onPress: () => void
+	onPress?: () => void
 }
 
 const FloatingButton: React.FC<FloatingButtonProps> = ({ onPress }) => {
 	const scaleValue = useRef(new Animated.Value(1)).current
+	const router = useRouter()
 
 	const handlePressIn = () => {
 		Animated.spring(scaleValue, {
@@ -29,7 +30,7 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ onPress }) => {
 
 	return (
 		<Animated.View style={[styles.buttonContainer, { transform: [{ scale: scaleValue }] }]}>
-			<Pressable style={styles.button} onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+			<Pressable style={styles.button} onPress={onPress ?? (() => router.push('/newPost'))} onPressIn={handlePressIn} onPressOut={handlePressOut}>
 				<Feather name='edit' size={hp(3)} color='#fff' />
 			</Pressable>
 		</Animated.View>
