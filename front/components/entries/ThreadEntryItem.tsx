@@ -37,13 +37,10 @@ const ThreadEntryItem: React.FC<ThreadEntryItemProps> = ({ entry, currentUserId,
 
 const styles = StyleSheet.create({
 	threadEntry: {
-		backgroundColor: theme.colors.light,
 		borderRadius: theme.radius.md,
-		shadowColor: theme.colors.dark,
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
-		elevation: 2,
+		borderWidth: 1,
+		borderColor: theme.colors.lightDark,
+		// elevation: 2,
 		padding: hp(1.5),
 		marginBottom: hp(1)
 	},

@@ -55,45 +55,47 @@ const EntryListItem: React.FC<EntryListItemProps> = ({ entry, currentUserId, sho
 	}
 
 	return (
-		<View style={styles.entryWithThreadsContainer}>
-			<View style={[styles.entryContainer, isCurrentUser && styles.currentUserEntry]}>
-				<View style={styles.entryHeader}>
-					<TouchableOpacity style={styles.userInfoContainer} onPress={() => onUserPress && onUserPress(entry.user)}>
-						<Avatar username={entry.user.username ?? ''} size={hp(5)} rounded={theme.radius.md} />
-						<View style={styles.userInfo}>
-							<Text style={[styles.username, isCurrentUser && styles.currentUserText]}>{entry.user.username}</Text>
-							<Text style={styles.date}>{formatEntryDate(entry.created_at)}</Text>
-						</View>
-					</TouchableOpacity>
+		<TouchableOpacity onPress={() => onUserPress && onUserPress(entry.user)}>
+			<View style={styles.entryWithThreadsContainer}>
+				<View style={[styles.entryContainer, isCurrentUser && styles.currentUserEntry]}>
+					<View style={styles.entryHeader}>
+						<TouchableOpacity style={styles.userInfoContainer} onPress={() => onUserPress && onUserPress(entry.user)}>
+							<Avatar username={entry.user.username ?? ''} size={hp(5)} rounded={theme.radius.md} />
+							<View style={styles.userInfo}>
+								<Text style={[styles.username, isCurrentUser && styles.currentUserText]}>{entry.user.username}</Text>
+								<Text style={styles.date}>{formatEntryDate(entry.created_at)}</Text>
+							</View>
+						</TouchableOpacity>
 
-					<EmotionBadge emotion={entry.emotion} />
+						<EmotionBadge emotion={entry.emotion} />
+					</View>
+
+					<View style={styles.entryContent}>
+						<Text style={styles.entryText}>{entry.text}</Text>
+
+						{entry.location && (
+							<View style={styles.locationContainer}>
+								<Feather name='map-pin' size={hp(1.8)} color={theme.colors.textLight} />
+								<Text style={styles.locationText}>{entry.location}</Text>
+							</View>
+						)}
+					</View>
+
+					<EntryActions entry={entry} isOwnEntry={isCurrentUser} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onShareEntry={handleShare} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} showEditDelete={showEditDelete} />
 				</View>
 
-				<View style={styles.entryContent}>
-					<Text style={styles.entryText}>{entry.text}</Text>
+				{hasThreads && <ThreadEntries entries={entry.child_entries} currentUserId={currentUserId} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onShareEntry={onShareEntry} />}
 
-					{entry.location && (
-						<View style={styles.locationContainer}>
-							<Feather name='map-pin' size={hp(1.8)} color={theme.colors.textLight} />
-							<Text style={styles.locationText}>{entry.location}</Text>
-						</View>
+				<View style={styles.replyFormContainer}>
+					{entry.more_entries > 0 && (
+						<TouchableOpacity style={styles.moreEntriesChip} onPress={() => onReplyEntry && onReplyEntry(entry)}>
+							<Text style={styles.moreEntriesChipText}>+{entry.more_entries} posts</Text>
+						</TouchableOpacity>
 					)}
+					{!isCurrentUser && <ReplyForm replyText={replyText} onChangeText={setReplyText} onSend={handleReply} />}
 				</View>
-
-				<EntryActions entry={entry} isOwnEntry={isCurrentUser} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onShareEntry={handleShare} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} showEditDelete={showEditDelete} />
 			</View>
-
-			{hasThreads && <ThreadEntries entries={entry.child_entries} currentUserId={currentUserId} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onShareEntry={onShareEntry} />}
-
-			<View style={styles.replyFormContainer}>
-				{entry.more_entries > 0 && (
-					<TouchableOpacity style={styles.moreEntriesChip} onPress={() => onReplyEntry && onReplyEntry(entry)}>
-						<Text style={styles.moreEntriesChipText}>+{entry.more_entries} posts</Text>
-					</TouchableOpacity>
-				)}
-				<ReplyForm replyText={replyText} onChangeText={setReplyText} onSend={handleReply} />
-			</View>
-		</View>
+		</TouchableOpacity>
 	)
 }
 
@@ -104,13 +106,11 @@ const styles = StyleSheet.create({
 	entryContainer: {
 		backgroundColor: theme.colors.light,
 		borderRadius: theme.radius.md,
-		shadowColor: theme.colors.dark,
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 3,
+		borderWidth: 1,
+		borderColor: theme.colors.lightDark,
 		padding: hp(2),
-		marginBottom: hp(0.5)
+		marginBottom: hp(0.5),
+		overflow: 'hidden'
 	},
 	currentUserEntry: {
 		borderLeftWidth: 3,
@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
 	replyFormContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginLeft: wp(8),
 		marginTop: hp(0.5)
 	},
 	entryHeader: {
@@ -166,9 +165,14 @@ const styles = StyleSheet.create({
 		marginLeft: wp(1)
 	},
 	moreEntriesChip: {
-		marginRight: wp(2)
+		marginRight: wp(2),
+		paddingVertical: hp(1),
+		paddingHorizontal: wp(3),
+		backgroundColor: theme.colors.light,
+		borderRadius: theme.radius.md
+		// borderWidth: 1
+		// borderColor: theme.colors.lightDark
 	},
-
 	moreEntriesChipText: {
 		color: theme.colors.primary,
 		fontSize: hp(1.6),
