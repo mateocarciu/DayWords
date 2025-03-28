@@ -14,6 +14,7 @@ import { formatEntryDate } from '@/utils/dateFormatters'
 interface EntryListItemProps {
 	entry: Entry
 	currentUserId: number
+	showEditDelete?: boolean
 	onLikeEntry?: (entryId: number) => void
 	onReplyEntry?: (parentEntry: Entry) => void
 	onDeleteEntry?: (entryId: number) => void
@@ -22,7 +23,7 @@ interface EntryListItemProps {
 	onUserPress?: (user: User) => void
 }
 
-const EntryListItem: React.FC<EntryListItemProps> = ({ entry, currentUserId, onLikeEntry, onReplyEntry, onDeleteEntry, onShareEntry, onEditEntry, onUserPress }) => {
+const EntryListItem: React.FC<EntryListItemProps> = ({ entry, currentUserId, showEditDelete, onLikeEntry, onReplyEntry, onDeleteEntry, onShareEntry, onEditEntry, onUserPress }) => {
 	const [replyText, setReplyText] = useState<string>('')
 	const isCurrentUser = entry.user_id === currentUserId
 	const hasThreads = entry.child_entries && entry.child_entries.length > 0
@@ -79,7 +80,7 @@ const EntryListItem: React.FC<EntryListItemProps> = ({ entry, currentUserId, onL
 					)}
 				</View>
 
-				<EntryActions entry={entry} isOwnEntry={isCurrentUser} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onShareEntry={handleShare} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} />
+				<EntryActions entry={entry} isOwnEntry={isCurrentUser} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onShareEntry={handleShare} onEditEntry={onEditEntry} onDeleteEntry={onDeleteEntry} showEditDelete={showEditDelete} />
 			</View>
 
 			{hasThreads && <ThreadEntries entries={entry.child_entries} currentUserId={currentUserId} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onShareEntry={onShareEntry} />}

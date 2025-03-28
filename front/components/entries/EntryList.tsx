@@ -15,9 +15,10 @@ interface EntryListProps {
 	onShareEntry?: (entry: Entry) => void
 	onEditEntry?: (entry: Entry) => void
 	onUserPress?: (user: User) => void
+	showEditDelete?: boolean
 }
 
-const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDeleteEntry, onShareEntry, onEditEntry, onUserPress }) => {
+const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDeleteEntry, onShareEntry, onEditEntry, onUserPress, showEditDelete = false }) => {
 	const authContext = useAuth()
 
 	if (!authContext) {
@@ -31,7 +32,7 @@ const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDele
 		await deleteEntry(entryId)
 	}
 
-	const renderItem = ({ item }: { item: Entry }) => <EntryListItem entry={item} currentUserId={user?.id ?? 0} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onDeleteEntry={onDeleteEntry} onShareEntry={onShareEntry} onEditEntry={onEditEntry} onUserPress={onUserPress} />
+	const renderItem = ({ item }: { item: Entry }) => <EntryListItem entry={item} currentUserId={user?.id ?? 0} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onDeleteEntry={onDeleteEntry} onShareEntry={onShareEntry} onEditEntry={onEditEntry} onUserPress={onUserPress} showEditDelete={showEditDelete} />
 
 	if (entries.length === 0) {
 		return (

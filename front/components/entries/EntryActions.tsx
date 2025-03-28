@@ -1,4 +1,3 @@
-// EntryActions.tsx
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { theme } from '@/constants/theme'
@@ -9,6 +8,7 @@ import { Entry } from '@/utils/types'
 interface EntryActionsProps {
 	entry: Entry
 	isOwnEntry: boolean
+	showEditDelete?: boolean
 	onLikeEntry?: (entryId: number) => void
 	onReplyEntry?: (parentEntry: Entry) => void
 	onShareEntry?: () => void
@@ -16,7 +16,7 @@ interface EntryActionsProps {
 	onDeleteEntry?: (entryId: number) => void
 }
 
-const EntryActions: React.FC<EntryActionsProps> = ({ entry, isOwnEntry, onLikeEntry, onReplyEntry, onShareEntry, onEditEntry, onDeleteEntry }) => {
+const EntryActions: React.FC<EntryActionsProps> = ({ entry, isOwnEntry, showEditDelete = false, onLikeEntry, onReplyEntry, onShareEntry, onEditEntry, onDeleteEntry }) => {
 	return (
 		<View style={styles.actionsContainer}>
 			<TouchableOpacity style={styles.actionButton} onPress={() => onLikeEntry && onLikeEntry(entry.id)}>
@@ -32,13 +32,13 @@ const EntryActions: React.FC<EntryActionsProps> = ({ entry, isOwnEntry, onLikeEn
 				<Feather name='share' size={hp(2.2)} color={theme.colors.textLight} />
 			</TouchableOpacity>
 
-			{isOwnEntry && (
+			{isOwnEntry && showEditDelete && (
 				<TouchableOpacity style={styles.actionButton} onPress={() => onEditEntry && onEditEntry(entry)}>
 					<Feather name='edit-2' size={hp(2.2)} color={theme.colors.textLight} />
 				</TouchableOpacity>
 			)}
 
-			{isOwnEntry && (
+			{isOwnEntry && showEditDelete && (
 				<TouchableOpacity style={styles.actionButton} onPress={() => onDeleteEntry && onDeleteEntry(entry.id)}>
 					<Feather name='trash-2' size={hp(2.2)} color={theme.colors.textLight} />
 				</TouchableOpacity>
