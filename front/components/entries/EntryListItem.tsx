@@ -10,6 +10,7 @@ import ReplyForm from '../inputs/ReplyForm'
 import EmotionBadge from './EmotionBadge'
 import EntryActions from './EntryActions'
 import { formatEntryDate } from '@/utils/dateFormatters'
+import { router } from 'expo-router'
 
 interface EntryListItemProps {
 	entry: Entry
@@ -55,11 +56,11 @@ const EntryListItem: React.FC<EntryListItemProps> = ({ entry, currentUserId, sho
 	}
 
 	return (
-		<TouchableOpacity onPress={() => onUserPress && onUserPress(entry.user)}>
+		<TouchableOpacity onPress={() => router.push(`/(main)/detail/${entry.id}`)} activeOpacity={1}>
 			<View style={styles.entryWithThreadsContainer}>
 				<View style={[styles.entryContainer, isCurrentUser && styles.currentUserEntry]}>
 					<View style={styles.entryHeader}>
-						<TouchableOpacity style={styles.userInfoContainer} onPress={() => onUserPress && onUserPress(entry.user)}>
+						<TouchableOpacity style={styles.userInfoContainer} onPress={() => (isCurrentUser ? router.push('/(main)/profile') : router.push(`/(main)/friends/${entry.user.id}`))}>
 							<Avatar username={entry.user.username ?? ''} size={hp(5)} rounded={theme.radius.md} />
 							<View style={styles.userInfo}>
 								<Text style={[styles.username, isCurrentUser && styles.currentUserText]}>{entry.user.username}</Text>

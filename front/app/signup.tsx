@@ -100,8 +100,7 @@ export default function signUp() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		gap: 45,
-		paddingHorizontal: wp(5)
+		gap: 45
 	},
 	welcomeText: {
 		fontSize: hp(4),
