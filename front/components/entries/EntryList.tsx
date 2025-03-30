@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FlatList, StyleSheet, View, Text, RefreshControl } from 'react-native'
 import { hp } from '@/helpers/common'
 import { Entry, User } from '@/utils/types'
@@ -16,9 +16,10 @@ interface EntryListProps {
 	onEditEntry?: (entry: Entry) => void
 	onUserPress?: (user: User) => void
 	showEditDelete?: boolean
+	entryId?: number
 }
 
-const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDeleteEntry, onShareEntry, onEditEntry, onUserPress, showEditDelete = false }) => {
+const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDeleteEntry, onShareEntry, onEditEntry, onUserPress, showEditDelete = false, entryId }) => {
 	const authContext = useAuth()
 
 	if (!authContext) {
@@ -26,34 +27,23 @@ const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDele
 		return null
 	}
 	const { user } = authContext
-	const { entries, isRefreshing, fetchEntries, deleteEntry } = useEntries(user?.id)
+	const { entries, entry, isRefreshing, fetchEntries, deleteEntry, fetchEntry } = useEntries(user?.id)
 
 	onDeleteEntry = async (entryId: number) => {
 		await deleteEntry(entryId)
 	}
 
+	useEffect(() => {
+		if (entryId) {
+			fetchEntry(entryId)
+		} else {
+			fetchEntries()
+		}
+	}, [entryId])
+
 	const renderItem = ({ item }: { item: Entry }) => <EntryListItem entry={item} currentUserId={user?.id ?? 0} onLikeEntry={onLikeEntry} onReplyEntry={onReplyEntry} onDeleteEntry={onDeleteEntry} onShareEntry={onShareEntry} onEditEntry={onEditEntry} onUserPress={onUserPress} showEditDelete={showEditDelete} />
 
-	if (entries.length === 0) {
-		return (
-			<FlatList
-				data={[]}
-				renderItem={null}
-				keyExtractor={() => 'key'}
-				showsVerticalScrollIndicator={false}
-				contentContainerStyle={styles.emptyContainer}
-				refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={fetchEntries} />}
-				ListEmptyComponent={
-					<View style={styles.emptyContent}>
-						<Feather name='clock' size={40} color='gray' />
-						<Text style={styles.emptyText}>You haven't posted yet !</Text>
-					</View>
-				}
-			/>
-		)
-	}
-
-	return <FlatList data={entries} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={fetchEntries} />} onScrollBeginDrag={Keyboard.dismiss} />
+	return <FlatList data={entryId ? (entry ? [entry] : []) : entries} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={entryId ? () => fetchEntry(entryId) : fetchEntries} />} onScrollBeginDrag={Keyboard.dismiss} />
 }
 
 const styles = StyleSheet.create({

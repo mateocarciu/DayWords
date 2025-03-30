@@ -5,6 +5,7 @@ import useSSE from '@/hooks/useSSE'
 
 const useEntries = (userId?: number) => {
 	const [entries, setEntries] = useState<Entry[]>([])
+	const [entry, setEntry] = useState<Entry | null>(null)
 	const [isLoading, setLoading] = useState<boolean>(false)
 	const [isRefreshing, setRefreshing] = useState<boolean>(false)
 
@@ -44,6 +45,23 @@ const useEntries = (userId?: number) => {
 		}
 	}
 
+	const fetchEntry = async ($entryId: number) => {
+		setRefreshing(true)
+
+		try {
+			const response = await authFetch(`${process.env.EXPO_PUBLIC_API_URL}/api/entries/${$entryId}`, {
+				method: 'GET'
+			})
+			setEntry(response)
+		} catch (error: any) {
+			console.error('Error fetching entry', error)
+		} finally {
+			setTimeout(() => {
+				setRefreshing(false)
+			}, 1000)
+		}
+	}
+
 	useEffect(() => {
 		if (userId) {
 			setLoading(true)
@@ -53,10 +71,12 @@ const useEntries = (userId?: number) => {
 
 	return {
 		entries,
+		entry,
 		isLoading,
 		isRefreshing,
 		fetchEntries,
-		deleteEntry
+		deleteEntry,
+		fetchEntry
 	}
 }
 
