@@ -48,7 +48,7 @@ const EntryList: React.FC<EntryListProps> = ({ onLikeEntry, onReplyEntry, onDele
 
 const styles = StyleSheet.create({
 	listContent: {
-		paddingVertical: hp(2)
+		// paddingVertical: hp(2)
 	},
 	emptyContainer: {
 		flex: 1,

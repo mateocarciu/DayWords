@@ -171,8 +171,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: wp(3),
 		backgroundColor: theme.colors.light,
 		borderRadius: theme.radius.md
-		// borderWidth: 1
-		// borderColor: theme.colors.lightDark
 	},
 	moreEntriesChipText: {
 		color: theme.colors.primary,
