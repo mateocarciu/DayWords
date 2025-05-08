@@ -1,54 +1,54 @@
 # DayWords
 
-DayWords est une application mobile développée en React Native. L'idée est que l'utilisateur puisse écrire une phrase, un texte ou un mot pour résumer sa journée. Il peut également démarrer un fil de discussion, ajouter des amis, voir les publications de ses amis et commenter celles-ci.
+DayWords is a mobile application developed in React Native. The idea is that the user can write a sentence, a text, or a word to summarize their day. They can also start a discussion thread, add friends, view their friends' posts, and comment on them.
 
 <div style="display: flex; justify-content: space-around; align-items: center; gap: 10px;">
     <img src="https://mateocarciu.github.io/images/DayWordsHomePage.webp" alt="Screenshot 1" style="width: 30%; height: auto;">
-        <img src="https://mateocarciu.github.io/images/DayWordsDetail.webp" alt="Screenshot 2" style="width: 30%; height: auto;">
+    <img src="https://mateocarciu.github.io/images/DayWordsDetail.webp" alt="Screenshot 2" style="width: 30%; height: auto;">
     <img src="https://mateocarciu.github.io/images/DayWordsFriends.webp" alt="Screenshot 3" style="width: 30%; height: auto;">
 </div>
 
-## Prérequis Backend
+## Backend Prerequisites
 
-Pour installer les dépendances et démarrer le serveur backend, exécutez les commandes suivantes :
+To install the dependencies and start the backend server, run the following commands:
 
 ```sh
 composer install
 php artisan serve
 ```
 
-Démarrer le serveur SSE :
+Start the SSE server:
 
 ```sh
 docker compose -f 'sse/docker-compose.yml' up -d --build
 ```
 
-## Prérequis Frontend
+## Frontend Prerequisites
 
-Pour installer les dépendances et démarrer le serveur frontend, exécutez les commandes suivantes :
+To install the dependencies and start the frontend server, run the following commands:
 
 ```sh
 npm install -g expo-cli
 npm install
 ```
 
-## Démarrer le Frontend
+## Start the Frontend
 
-Pour démarrer l'application frontend, exécutez la commande suivante :
+To start the frontend application, run the following command:
 
 ```sh
 npx expo start
 ```
 
-## Fonctionnalités
+## Features
 
-1. Écrire une entrée par jour (style journal quotidien).
-2. Démarrer un fil de discussion.
-3. Ajouter des amis et voir leurs publications.
-4. Commenter les publications des amis.
-5. Notifications en temps réel pour les nouvelles publications des amis.
+1. Write one entry per day (daily journal style).
+2. Start a discussion thread.
+3. Add friends and view their posts.
+4. Comment on friends' posts.
+5. Real-time notifications for new posts from friends.
 
-## Technologies Utilisées
+## Technologies Used
 
 - **Frontend**: React Native, Expo
 - **Backend**: Laravel, PHP
